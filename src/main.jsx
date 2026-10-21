@@ -5,22 +5,43 @@ import { createRoot } from 'react-dom/client';
 /* ============================================================
    DATOS SIMULADOS GLOBALES (AMADEUS)
    ============================================================ */
-const PAISES = ['Todos', 'Francia', 'España', 'Japón', 'Estados Unidos'];
+const PAISES = [
+  'Todos', 'México', 'Estados Unidos', 'Brasil', 'Reino Unido', 
+  'Francia', 'España', 'Italia', 'Japón', 'Australia', 'Egipto'
+];
 
 const AMADEUS_VUELOS = [
-  { idVuelo: 'AM-V1', pais: 'Francia', aerolinea: 'Air France', precioMXN: 15000, duracion: '12h 00m', escalas: 0 },
-  { idVuelo: 'AM-V2', pais: 'Francia', aerolinea: 'Iberia', precioMXN: 13500, duracion: '15h 30m', escalas: 1 },
-  { idVuelo: 'AM-V3', pais: 'España', aerolinea: 'Iberia', precioMXN: 12000, duracion: '10h 15m', escalas: 0 },
-  { idVuelo: 'AM-V4', pais: 'Japón', aerolinea: 'ANA', precioMXN: 28000, duracion: '18h 45m', escalas: 1 },
-  { idVuelo: 'AM-V5', pais: 'Estados Unidos', aerolinea: 'American Airlines', precioMXN: 8500, duracion: '4h 30m', escalas: 0 },
+  // América
+  { idVuelo: 'AM-V1', pais: 'México', aerolinea: 'Aeroméxico', precioMXN: 4500, duracion: '2h 30m', escalas: 0 },
+  { idVuelo: 'AM-V2', pais: 'Estados Unidos', aerolinea: 'American Airlines', precioMXN: 8500, duracion: '4h 30m', escalas: 0 },
+  { idVuelo: 'AM-V3', pais: 'Brasil', aerolinea: 'LATAM', precioMXN: 12000, duracion: '9h 45m', escalas: 1 },
+  // Europa
+  { idVuelo: 'AM-V4', pais: 'Reino Unido', aerolinea: 'British Airways', precioMXN: 14500, duracion: '10h 20m', escalas: 0 },
+  { idVuelo: 'AM-V5', pais: 'Francia', aerolinea: 'Air France', precioMXN: 15000, duracion: '11h 00m', escalas: 0 },
+  { idVuelo: 'AM-V6', pais: 'España', aerolinea: 'Iberia', precioMXN: 13500, duracion: '10h 15m', escalas: 0 },
+  { idVuelo: 'AM-V7', pais: 'Italia', aerolinea: 'Alitalia', precioMXN: 16000, duracion: '12h 30m', escalas: 1 },
+  // Asia y Oceanía
+  { idVuelo: 'AM-V8', pais: 'Japón', aerolinea: 'ANA', precioMXN: 28000, duracion: '18h 45m', escalas: 1 },
+  { idVuelo: 'AM-V9', pais: 'Australia', aerolinea: 'Qantas', precioMXN: 32000, duracion: '22h 10m', escalas: 2 },
+  // África
+  { idVuelo: 'AM-V10', pais: 'Egipto', aerolinea: 'EgyptAir', precioMXN: 19500, duracion: '15h 30m', escalas: 1 },
 ];
 
 const AMADEUS_HOSPEDAJES = [
-  { idHotel: 'AM-H1', pais: 'Francia', nombre: 'Hotel Ritz Paris', precioMXN: 25000, camas: 2 },
-  { idHotel: 'AM-H2', pais: 'Francia', nombre: 'Generator Paris Hostel', precioMXN: 4500, camas: 4 },
-  { idHotel: 'AM-H3', pais: 'España', nombre: 'Hotel Riu Madrid', precioMXN: 8000, camas: 3 },
-  { idHotel: 'AM-H4', pais: 'Japón', nombre: 'Shinjuku Granbell Hotel', precioMXN: 12000, camas: 2 },
-  { idHotel: 'AM-H5', pais: 'Estados Unidos', nombre: 'The Manhattan at Times Square', precioMXN: 18000, camas: 2 },
+  // América
+  { idHotel: 'AM-H1', pais: 'México', nombre: 'Hotel Geneve CDMX', precioMXN: 3500, camas: 2 },
+  { idHotel: 'AM-H2', pais: 'Estados Unidos', nombre: 'The Manhattan Times Square', precioMXN: 18000, camas: 2 },
+  { idHotel: 'AM-H3', pais: 'Brasil', nombre: 'Copacabana Palace', precioMXN: 9500, camas: 2 },
+  // Europa
+  { idHotel: 'AM-H4', pais: 'Reino Unido', nombre: 'The Savoy London', precioMXN: 22000, camas: 2 },
+  { idHotel: 'AM-H5', pais: 'Francia', nombre: 'Generator Paris Hostel', precioMXN: 4500, camas: 4 },
+  { idHotel: 'AM-H6', pais: 'España', nombre: 'Hotel Riu Madrid', precioMXN: 8000, camas: 3 },
+  { idHotel: 'AM-H7', pais: 'Italia', nombre: 'Hotel Artemide Roma', precioMXN: 11000, camas: 2 },
+  // Asia y Oceanía
+  { idHotel: 'AM-H8', pais: 'Japón', nombre: 'Shinjuku Granbell Hotel', precioMXN: 12000, camas: 2 },
+  { idHotel: 'AM-H9', pais: 'Australia', nombre: 'Sydney Harbour YHA', precioMXN: 8500, camas: 4 },
+  // África
+  { idHotel: 'AM-H10', pais: 'Egipto', nombre: 'Pyramids View Inn', precioMXN: 4000, camas: 2 },
 ];
 
 /* ============================================================
@@ -30,12 +51,10 @@ const INITIAL_USUARIOS = [
   { id: 1, nombre: 'Carlos Gerente', email: 'gerente@travelpro.com', password: '123', rol: 'gerente', creadoPor: null },
   { id: 2, nombre: 'Laura Jefa', email: 'jefa@travelpro.com', password: '123', rol: 'jefe', creadoPor: 1 },
   { id: 3, nombre: 'Misael Agente', email: 'agente@travelpro.com', password: '123', rol: 'agente', creadoPor: 2 },
-  { id: 4, nombre: 'Pedro Agente', email: 'pedro@travelpro.com', password: '123', rol: 'agente', creadoPor: 2 },
 ];
 
 const INITIAL_CLIENTES = [
   { idCliente: 101, nombre: 'Juan Pérez', email: 'juan@email.com', telefono: '555-1234', idAgente: 3 },
-  { idCliente: 102, nombre: 'María López', email: 'maria@email.com', telefono: '555-5678', idAgente: 4 },
 ];
 
 /* ============================================================
@@ -57,7 +76,6 @@ const globalCSS = `
   .menu-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 10px; color: #4b5563; font-weight: 500; font-size: 14px; cursor: pointer; transition: all 0.2s; margin-bottom: 4px; border: none; background: transparent; width: 100%; text-align: left; }
   .menu-item:hover { background: #eff6ff; color: #1d4ed8; }
   .menu-item.active { background: #1d4ed8; color: white; box-shadow: 0 4px 12px rgba(29, 78, 216, 0.2); }
-  .menu-item.disabled { opacity: 0.5; cursor: not-allowed; }
   
   /* MAIN CONTENT */
   .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
@@ -164,7 +182,6 @@ function LoginScreen({ onLogin, usuarios }) {
 }
 
 function DashboardModule({ user, usuarios, clientes }) {
-  // Filtrar subordinados según el rol
   const misSubordinados = usuarios.filter(u => u.creadoPor === user.id);
   const misClientes = clientes.filter(c => c.idAgente === user.id);
 
@@ -173,8 +190,8 @@ function DashboardModule({ user, usuarios, clientes }) {
       <div className="kpi-grid">
         {user.rol === 'gerente' && (
           <>
-            <div className="kpi-card"><div className="kpi-title">Jefes Activos</div><div className="kpi-value">{misSubordinados.length}</div></div>
-            <div className="kpi-card" style={{ borderLeftColor: '#10b981' }}><div className="kpi-title">Ventas Totales</div><div className="kpi-value">$450K</div></div>
+            <div className="kpi-card"><div className="kpi-title">Personal a Cargo</div><div className="kpi-value">{misSubordinados.length}</div></div>
+            <div className="kpi-card" style={{ borderLeftColor: '#10b981' }}><div className="kpi-title">Ventas Globales</div><div className="kpi-value">$450K</div></div>
           </>
         )}
         {user.rol === 'jefe' && (
@@ -219,29 +236,24 @@ function DashboardModule({ user, usuarios, clientes }) {
 }
 
 function UserManagementModule({ user, usuarios, setUsuarios }) {
-  const [form, setForm] = useState({ nombre: '', email: '', password: '123' });
+  const [form, setForm] = useState({ nombre: '', email: '', password: '123', rol: 'agente' });
 
   const handleCreate = (e) => {
     e.preventDefault();
     if (!form.nombre || !form.email) return;
-
-    let nuevoRol = '';
-    if (user.rol === 'gerente') nuevoRol = 'jefe';
-    else if (user.rol === 'jefe') nuevoRol = 'agente';
-    else return; // Agentes no dan de alta personal
 
     const nuevoUsuario = {
       id: Date.now(),
       nombre: form.nombre,
       email: form.email,
       password: form.password,
-      rol: nuevoRol,
+      rol: form.rol,
       creadoPor: user.id
     };
 
     setUsuarios([...usuarios, nuevoUsuario]);
-    setForm({ nombre: '', email: '', password: '123' });
-    alert(`${nuevoRol.toUpperCase()} creado exitosamente.`);
+    setForm({ nombre: '', email: '', password: '123', rol: 'agente' });
+    alert(`${form.rol.toUpperCase()} creado exitosamente.`);
   };
 
   if (user.rol === 'agente') return null;
@@ -251,7 +263,7 @@ function UserManagementModule({ user, usuarios, setUsuarios }) {
   return (
     <div className="grid">
       <div className="card">
-        <div className="card-header"><span className="card-title">Dar de Alta Nuevo {user.rol === 'gerente' ? 'Jefe' : 'Agente'}</span></div>
+        <div className="card-header"><span className="card-title">Dar de Alta Nuevo Usuario</span></div>
         <form onSubmit={handleCreate}>
           <div className="form-group">
             <label className="form-label">Nombre Completo</label>
@@ -262,10 +274,14 @@ function UserManagementModule({ user, usuarios, setUsuarios }) {
             <input className="form-input" type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} placeholder="correo@travelpro.com" />
           </div>
           <div className="form-group">
-            <label className="form-label">Contraseña (por defecto: 123)</label>
-            <input className="form-input" value={form.password} disabled style={{ background: '#f3f4f6' }} />
+            <label className="form-label">Rol del Usuario</label>
+            <select className="form-input" value={form.rol} onChange={e => setForm({...form, rol: e.target.value})}>
+              {user.rol === 'gerente' && <option value="gerente">Gerente</option>}
+              {(user.rol === 'gerente' || user.rol === 'jefe') && <option value="jefe">Jefe de Equipo</option>}
+              <option value="agente">Agente de Viajes</option>
+            </select>
           </div>
-          <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Crear {user.rol === 'gerente' ? 'Jefe' : 'Agente'}</button>
+          <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Crear Usuario</button>
         </form>
       </div>
 
@@ -275,6 +291,7 @@ function UserManagementModule({ user, usuarios, setUsuarios }) {
         {subordinados.map(s => (
           <div key={s.id} className="list-item">
             <div><strong>{s.nombre}</strong><br/><span style={{ fontSize: '13px', color: '#6b7280' }}>{s.email}</span></div>
+            <span style={{ background: '#e0e7ff', color: '#3730a3', padding: '4px 8px', borderRadius: '4px', fontSize: '12px', textTransform: 'uppercase', fontWeight: 'bold' }}>{s.rol}</span>
           </div>
         ))}
       </div>
@@ -353,7 +370,6 @@ function CotizacionFlow({ user, clientes, setClientes }) {
 
   return (
     <div>
-      {/* STEPPER VISUAL */}
       <div style={{ display: 'flex', gap: '10px', marginBottom: '24px' }}>
         {[1, 2, 3].map(s => (
           <div key={s} style={{ flex: 1, height: '6px', background: step >= s ? '#3b82f6' : '#e5e7eb', borderRadius: '10px' }}></div>
@@ -399,7 +415,7 @@ function CotizacionFlow({ user, clientes, setClientes }) {
                 return (
                   <div key={v.idVuelo} className={`card ${isSelected ? 'selected-border' : ''}`} style={{ marginBottom: 0 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                      <strong>{v.aerolinea}</strong>
+                      <strong>{v.aerolinea} <span style={{fontSize:'12px', color:'#6b7280'}}>({v.pais})</span></strong>
                       <span className="price-tag">${v.precioMXN.toLocaleString()}</span>
                     </div>
                     <div style={{ fontSize: '13px', color: '#6b7280', marginBottom: '16px' }}>
@@ -426,7 +442,7 @@ function CotizacionFlow({ user, clientes, setClientes }) {
                 return (
                   <div key={h.idHotel} className={`card ${isSelected ? 'selected-border' : ''}`} style={{ marginBottom: 0 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                      <strong>{h.nombre}</strong>
+                      <strong>{h.nombre} <span style={{fontSize:'12px', color:'#6b7280'}}>({h.pais})</span></strong>
                       <span className="price-tag">${h.precioMXN.toLocaleString()}</span>
                     </div>
                     <div style={{ fontSize: '13px', color: '#6b7280', marginBottom: '16px' }}>
@@ -468,7 +484,7 @@ function CotizacionFlow({ user, clientes, setClientes }) {
             <div style={{ marginTop: '24px', padding: '24px', background: '#1e3a8a', color: 'white', borderRadius: '16px' }}>
               <div style={{ fontSize: '14px', opacity: 0.8 }}>TOTAL COTIZADO</div>
               <div style={{ fontSize: '32px', fontWeight: '800' }}>${(reservaVuelo.precioMXN + reservaHospedaje.precioMXN).toLocaleString()} MXN</div>
-              <div style={{ fontSize: '12px', marginTop: '8px', opacity: 0.8 }}>Cliente: {selectedClient.nombre} | Destino: {planData.destino}</div>
+              <div style={{ fontSize: '12px', marginTop: '8px', opacity: 0.8 }}>Cliente: {selectedClient.nombre} | Destino: {planData.destino} ({planData.paisFiltro})</div>
             </div>
             
             <button className="btn btn-primary" onClick={() => window.print()} style={{ width: '100%', marginTop: '16px' }}>
@@ -519,7 +535,7 @@ function App() {
             
             {(user.rol === 'gerente' || user.rol === 'jefe') && (
               <button className={`menu-item ${activeTab === 'usuarios' ? 'active' : ''}`} onClick={() => setActiveTab('usuarios')}>
-                👥 Dar de alta {user.rol === 'gerente' ? 'Jefes' : 'Agentes'}
+                👥 Dar de Alta Personal
               </button>
             )}
 
