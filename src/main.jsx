@@ -3,115 +3,138 @@ import React, { useState, useMemo } from 'react';
 import { createRoot } from 'react-dom/client';
 
 /* ============================================================
-   DATOS SIMULADOS (MOCK DATA)
+   DATOS SIMULADOS GLOBALES (AMADEUS)
    ============================================================ */
-const USUARIOS = [
-  { id: 1, nombre: 'Carlos Gerente', email: 'gerente@travelpro.com', password: '123', rol: 'gerente' },
-  { id: 2, nombre: 'Laura Jefa', email: 'jefa@travelpro.com', password: '123', rol: 'jefe' },
-  { id: 3, nombre: 'Misael Agente', email: 'agente@travelpro.com', password: '123', rol: 'agente' },
-];
+const PAISES = ['Todos', 'Francia', 'España', 'Japón', 'Estados Unidos'];
 
-const CLIENTES = [
-  { idCliente: 101, nombre: 'Juan Pérez', email: 'juan@email.com', telefono: '555-1234' },
-  { idCliente: 102, nombre: 'María López', email: 'maria@email.com', telefono: '555-5678' },
-];
-
-// Simulación de catálogo de Amadeus
 const AMADEUS_VUELOS = [
-  { idVuelo: 'AM-V1', aerolinea: 'Iberia', precioMXN: 13790, duracionIda: '15h 35m', escalas: 1, requiereVisa: false },
-  { idVuelo: 'AM-V2', aerolinea: 'Westyet', precioMXN: 11697, duracionIda: '27h 15m', escalas: 1, requiereVisa: true },
+  { idVuelo: 'AM-V1', pais: 'Francia', aerolinea: 'Air France', precioMXN: 15000, duracion: '12h 00m', escalas: 0 },
+  { idVuelo: 'AM-V2', pais: 'Francia', aerolinea: 'Iberia', precioMXN: 13500, duracion: '15h 30m', escalas: 1 },
+  { idVuelo: 'AM-V3', pais: 'España', aerolinea: 'Iberia', precioMXN: 12000, duracion: '10h 15m', escalas: 0 },
+  { idVuelo: 'AM-V4', pais: 'Japón', aerolinea: 'ANA', precioMXN: 28000, duracion: '18h 45m', escalas: 1 },
+  { idVuelo: 'AM-V5', pais: 'Estados Unidos', aerolinea: 'American Airlines', precioMXN: 8500, duracion: '4h 30m', escalas: 0 },
 ];
 
 const AMADEUS_HOSPEDAJES = [
-  { idHotel: 'AM-H1', nombre: 'Rivoli Central Apartment', precioMXN: 8814, camas: 3, banios: 2 },
-  { idHotel: 'AM-H2', nombre: 'UCPA Sport Station Hostel', precioMXN: 11847, camas: 5, banios: 1 },
-];
-
-const TRANSPORTE_LOCAL = [
-  { idTransporte: 'T1', tipo: 'Pase Semanal Navigo', precioMXN: 679 },
-  { idTransporte: 'T2', tipo: 'Paris Visite (5 días)', precioMXN: 1634 },
-];
-
-const ATRACCIONES = [
-  { idAtraccion: 'A1', nombre: 'Museo del Louvre', precioMXN: 400 },
-  { idAtraccion: 'A2', nombre: 'Torre Eiffel', precioMXN: 500 },
-];
-
-const GASTOS_CATALOGO = [
-  { tipo: 'eSIM', descripcion: 'Orange Holiday', costoMXN: 337.60 },
-  { tipo: 'Adaptador', descripcion: 'Adaptador Universal', costoMXN: 253.37 },
-  { tipo: 'Visa', descripcion: 'Visa Canadá', costoMXN: 1400.00 },
+  { idHotel: 'AM-H1', pais: 'Francia', nombre: 'Hotel Ritz Paris', precioMXN: 25000, camas: 2 },
+  { idHotel: 'AM-H2', pais: 'Francia', nombre: 'Generator Paris Hostel', precioMXN: 4500, camas: 4 },
+  { idHotel: 'AM-H3', pais: 'España', nombre: 'Hotel Riu Madrid', precioMXN: 8000, camas: 3 },
+  { idHotel: 'AM-H4', pais: 'Japón', nombre: 'Shinjuku Granbell Hotel', precioMXN: 12000, camas: 2 },
+  { idHotel: 'AM-H5', pais: 'Estados Unidos', nombre: 'The Manhattan at Times Square', precioMXN: 18000, camas: 2 },
 ];
 
 /* ============================================================
-   ESTILOS GLOBALES
+   ESTADO INICIAL DE USUARIOS Y CLIENTES
+   ============================================================ */
+const INITIAL_USUARIOS = [
+  { id: 1, nombre: 'Carlos Gerente', email: 'gerente@travelpro.com', password: '123', rol: 'gerente', creadoPor: null },
+  { id: 2, nombre: 'Laura Jefa', email: 'jefa@travelpro.com', password: '123', rol: 'jefe', creadoPor: 1 },
+  { id: 3, nombre: 'Misael Agente', email: 'agente@travelpro.com', password: '123', rol: 'agente', creadoPor: 2 },
+  { id: 4, nombre: 'Pedro Agente', email: 'pedro@travelpro.com', password: '123', rol: 'agente', creadoPor: 2 },
+];
+
+const INITIAL_CLIENTES = [
+  { idCliente: 101, nombre: 'Juan Pérez', email: 'juan@email.com', telefono: '555-1234', idAgente: 3 },
+  { idCliente: 102, nombre: 'María López', email: 'maria@email.com', telefono: '555-5678', idAgente: 4 },
+];
+
+/* ============================================================
+   ESTILOS GLOBALES (DISEÑO MODERNO)
    ============================================================ */
 const globalCSS = `
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f0f4f8; color: #1a202c; }
-  button { font-family: inherit; cursor: pointer; }
-  input, select { font-family: inherit; }
-  .app { min-height: 100vh; display: flex; flex-direction: column; }
-  .header { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); color: white; padding: 20px 32px; display: flex; justify-content: space-between; align-items: center; }
-  .header h1 { font-size: 20px; font-weight: 700; }
-  .user-info { display: flex; align-items: center; gap: 12px; font-size: 14px; }
-  .badge-rol { background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 12px; font-weight: bold; text-transform: uppercase; font-size: 12px; }
-  .logout-btn { background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 24px 20px; width: 100%; flex: 1; }
-  .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; background: white; padding: 8px; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-  .tab { padding: 10px 18px; border-radius: 8px; border: none; background: transparent; color: #4a5568; font-weight: 600; font-size: 14px; }
-  .tab.active { background: #1e3a8a; color: white; }
-  .tab-badge { background: #f59e0b; color: white; border-radius: 10px; padding: 1px 7px; font-size: 11px; margin-left: 6px; }
-  .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 16px; }
-  .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #edf2f7; padding-bottom: 12px; }
-  .card-title { font-size: 16px; font-weight: 700; color: #1e3a8a; }
-  .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
-  .btn { padding: 10px 18px; border-radius: 8px; border: none; font-weight: 600; font-size: 14px; }
-  .btn-primary { background: #1e3a8a; color: white; }
-  .btn-secondary { background: #edf2f7; color: #2d3748; }
-  .btn-danger { background: #fed7d7; color: #c53030; }
-  .btn-sm { padding: 6px 12px; font-size: 13px; }
-  .form-group { margin-bottom: 14px; }
-  .form-label { display: block; font-size: 13px; font-weight: 600; color: #4a5568; margin-bottom: 6px; }
-  .form-input { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e0; border-radius: 8px; font-size: 14px; }
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .row-data { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #edf2f7; font-size: 14px; }
-  .row-data:last-child { border-bottom: none; }
-  .price { font-size: 20px; font-weight: 800; color: #1e3a8a; }
-  .badge-info { background: #bee3f8; color: #2a4365; padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; }
-  .highlight { border: 2px solid #3b82f6; background: #ebf8ff; }
-  .summary-total { background: #1e3a8a; color: white; padding: 24px; border-radius: 12px; margin: 16px 0; }
-  .summary-total .amount { font-size: 32px; font-weight: 800; }
-  .login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #1e3a8a; }
-  .login-card { background: white; padding: 40px; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-  .error-msg { color: #c53030; font-size: 13px; margin-bottom: 10px; }
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+  body { background-color: #f3f4f6; color: #1f2937; }
+  
+  /* LAYOUT */
+  .app-container { display: flex; height: 100vh; overflow: hidden; }
+  
+  /* SIDEBAR */
+  .sidebar { width: 260px; background: #ffffff; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; box-shadow: 2px 0 5px rgba(0,0,0,0.02); z-index: 10; }
+  .sidebar-logo { padding: 24px; font-size: 20px; font-weight: 700; color: #1d4ed8; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #f3f4f6; }
+  .sidebar-menu { flex: 1; padding: 20px 12px; overflow-y: auto; }
+  .menu-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 10px; color: #4b5563; font-weight: 500; font-size: 14px; cursor: pointer; transition: all 0.2s; margin-bottom: 4px; border: none; background: transparent; width: 100%; text-align: left; }
+  .menu-item:hover { background: #eff6ff; color: #1d4ed8; }
+  .menu-item.active { background: #1d4ed8; color: white; box-shadow: 0 4px 12px rgba(29, 78, 216, 0.2); }
+  .menu-item.disabled { opacity: 0.5; cursor: not-allowed; }
+  
+  /* MAIN CONTENT */
+  .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+  .topbar { background: white; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e7eb; position: sticky; top: 0; z-index: 5; }
+  .topbar h1 { font-size: 18px; font-weight: 600; color: #374151; }
+  .user-profile { display: flex; align-items: center; gap: 16px; }
+  .role-badge { background: #dbeafe; color: #1e40af; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; text-transform: uppercase; }
+  .btn-logout { background: #fee2e2; color: #b91c1c; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+  .btn-logout:hover { background: #fecaca; }
+  
+  .content-area { padding: 32px; max-width: 1200px; margin: 0 auto; width: 100%; }
+  
+  /* CARDS */
+  .card { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); margin-bottom: 24px; border: 1px solid #f3f4f6; }
+  .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #f3f4f6; padding-bottom: 16px; }
+  .card-title { font-size: 18px; font-weight: 700; color: #111827; }
+  .grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+  
+  /* FORMS & BUTTONS */
+  .form-group { margin-bottom: 16px; }
+  .form-label { display: block; font-size: 13px; font-weight: 600; color: #4b5563; margin-bottom: 8px; }
+  .form-input { width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 14px; transition: border 0.2s, box-shadow 0.2s; outline: none; }
+  .form-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  
+  .btn { padding: 12px 20px; border-radius: 10px; border: none; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-primary { background: #1d4ed8; color: white; box-shadow: 0 2px 4px rgba(29, 78, 216, 0.2); }
+  .btn-primary:hover { background: #1e40af; }
+  .btn-primary:disabled { background: #9ca3af; cursor: not-allowed; box-shadow: none; }
+  .btn-secondary { background: #f3f4f6; color: #374151; }
+  .btn-secondary:hover { background: #e5e7eb; }
+  .btn-danger { background: #fee2e2; color: #b91c1c; }
+  .btn-danger:hover { background: #fecaca; }
+  .btn-sm { padding: 8px 14px; font-size: 13px; }
+  
+  /* TABLES & LISTS */
+  .list-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-bottom: 1px solid #f3f4f6; transition: background 0.2s; }
+  .list-item:last-child { border-bottom: none; }
+  .list-item:hover { background: #f9fafb; }
+  .price-tag { font-size: 18px; font-weight: 700; color: #059669; }
+  .selected-border { border: 2px solid #10b981; background: #ecfdf5; border-radius: 12px; }
+  
+  /* DASHBOARD KPIS */
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 32px; }
+  .kpi-card { background: white; padding: 24px; border-radius: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-left: 4px solid #3b82f6; }
+  .kpi-title { font-size: 13px; color: #6b7280; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
+  .kpi-value { font-size: 28px; font-weight: 800; color: #111827; }
+  
+  /* LOGIN */
+  .login-bg { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); }
+  .login-card { background: white; padding: 40px; border-radius: 20px; width: 100%; max-width: 420px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+  .error-msg { background: #fef2f2; color: #b91c1c; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; border: 1px solid #fecaca; }
 `;
 
 /* ============================================================
-   LOGIN (CON SELECCIÓN DE ROL)
+   COMPONENTES
    ============================================================ */
-function LoginScreen({ onLogin }) {
-  const [email, setEmail] = useState('agente@travelpro.com');
+
+function LoginScreen({ onLogin, usuarios }) {
+  const [email, setEmail] = useState('gerente@travelpro.com');
   const [password, setPassword] = useState('123');
   const [error, setError] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const user = USUARIOS.find(u => u.email === email && u.password === password);
-    if (user) {
-      onLogin(user);
-    } else {
-      setError('Credenciales incorrectas. Usa: gerente@travelpro.com, jefa@travelpro.com o agente@travelpro.com (pass: 123)');
-    }
+    const user = usuarios.find(u => u.email === email && u.password === password);
+    if (user) onLogin(user);
+    else setError('Credenciales incorrectas. Revisa la lista de usuarios de prueba.');
   };
 
   return (
     <>
       <style>{globalCSS}</style>
-      <div className="login-screen">
+      <div className="login-bg">
         <div className="login-card">
-          <h2 style={{ color: '#1e3a8a', marginBottom: '8px' }}>✈️ TravelPro Agency</h2>
-          <p style={{ color: '#718096', marginBottom: '24px', fontSize: '14px' }}>Sistema Interno de Cotización</p>
+          <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#111827', marginBottom: '8px' }}>✈️ TravelPro B2B</h2>
+          <p style={{ color: '#6b7280', marginBottom: '32px', fontSize: '14px' }}>Portal de Gestión de Agencia</p>
           
           <form onSubmit={handleSubmit}>
             <div className="form-group">
@@ -122,15 +145,17 @@ function LoginScreen({ onLogin }) {
               <label className="form-label">Contraseña</label>
               <input className="form-input" type="password" value={password} onChange={e => setPassword(e.target.value)} />
             </div>
-            {error && <p className="error-msg">{error}</p>}
+            {error && <div className="error-msg">{error}</div>}
             <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Ingresar al Sistema</button>
           </form>
-          <div style={{ marginTop: '20px', fontSize: '12px', color: '#718096', background: '#f7fafc', padding: '10px', borderRadius: '8px' }}>
-            <strong>Roles de prueba:</strong><br/>
-            gerente@travelpro.com<br/>
-            jefa@travelpro.com<br/>
-            agente@travelpro.com<br/>
-            (Contraseña: 123)
+          
+          <div style={{ marginTop: '24px', paddingTop: '24px', borderTop: '1px solid #e5e7eb', fontSize: '12px', color: '#6b7280' }}>
+            <p style={{ fontWeight: 'bold', marginBottom: '8px' }}>Usuarios de prueba (pass: 123):</p>
+            <ul style={{ listStyle: 'none', lineHeight: '1.8' }}>
+              <li>👑 Gerente: <b>gerente@travelpro.com</b></li>
+              <li>👔 Jefe: <b>jefa@travelpro.com</b></li>
+              <li>💼 Agente: <b>agente@travelpro.com</b></li>
+            </ul>
           </div>
         </div>
       </div>
@@ -138,383 +163,320 @@ function LoginScreen({ onLogin }) {
   );
 }
 
-/* ============================================================
-   DASHBOARD JERÁRQUICO (Para Gerente y Jefe)
-   ============================================================ */
-function DashboardModule({ user }) {
+function DashboardModule({ user, usuarios, clientes }) {
+  // Filtrar subordinados según el rol
+  const misSubordinados = usuarios.filter(u => u.creadoPor === user.id);
+  const misClientes = clientes.filter(c => c.idAgente === user.id);
+
   return (
     <div>
-      <div className="card" style={{ background: '#1e3a8a', color: 'white' }}>
-        <h2>Bienvenido, {user.nombre}</h2>
-        <p>Rol: {user.rol.toUpperCase()}</p>
+      <div className="kpi-grid">
+        {user.rol === 'gerente' && (
+          <>
+            <div className="kpi-card"><div className="kpi-title">Jefes Activos</div><div className="kpi-value">{misSubordinados.length}</div></div>
+            <div className="kpi-card" style={{ borderLeftColor: '#10b981' }}><div className="kpi-title">Ventas Totales</div><div className="kpi-value">$450K</div></div>
+          </>
+        )}
+        {user.rol === 'jefe' && (
+          <>
+            <div className="kpi-card"><div className="kpi-title">Agentes a Cargo</div><div className="kpi-value">{misSubordinados.length}</div></div>
+            <div className="kpi-card" style={{ borderLeftColor: '#10b981' }}><div className="kpi-title">Cotizaciones del Equipo</div><div className="kpi-value">24</div></div>
+          </>
+        )}
+        {user.rol === 'agente' && (
+          <>
+            <div className="kpi-card"><div className="kpi-title">Mis Clientes</div><div className="kpi-value">{misClientes.length}</div></div>
+            <div className="kpi-card" style={{ borderLeftColor: '#f59e0b' }}><div className="kpi-title">Planes en Curso</div><div className="kpi-value">3</div></div>
+          </>
+        )}
       </div>
-      
-      {user.rol === 'gerente' && (
-        <div className="grid">
-          <div className="card">
-            <div className="card-header"><span className="card-title">Jefes de Equipo a cargo</span></div>
-            <p>Laura Jefa (jefa@travelpro.com)</p>
-          </div>
-          <div className="card">
-            <div className="card-header"><span className="card-title">Métricas Globales</span></div>
-            <p>Cotizaciones generadas: 45</p>
-            <p>Ingresos por comisiones: $45,000 MXN</p>
-          </div>
-        </div>
-      )}
 
-      {user.rol === 'jefe' && (
-        <div className="grid">
-          <div className="card">
-            <div className="card-header"><span className="card-title">Agentes a cargo</span></div>
-            <p>Misael Agente (agente@travelpro.com)</p>
+      <div className="card">
+        <div className="card-header"><span className="card-title">Mi Equipo / Cartera</span></div>
+        {user.rol === 'agente' ? (
+          <div>
+            {misClientes.length === 0 ? <p style={{ color: '#6b7280' }}>Aún no tienes clientes asignados.</p> : null}
+            {misClientes.map(c => (
+              <div key={c.idCliente} className="list-item">
+                <div><strong>{c.nombre}</strong><br/><span style={{ fontSize: '13px', color: '#6b7280' }}>{c.email}</span></div>
+              </div>
+            ))}
           </div>
-          <div className="card">
-            <div className="card-header"><span className="card-title">Métricas de Equipo</span></div>
-            <p>Cotizaciones del equipo: 12</p>
+        ) : (
+          <div>
+            {misSubordinados.length === 0 ? <p style={{ color: '#6b7280' }}>No tienes subordinados directos aún.</p> : null}
+            {misSubordinados.map(s => (
+              <div key={s.id} className="list-item">
+                <div><strong>{s.nombre}</strong><br/><span style={{ fontSize: '13px', color: '#6b7280' }}>{s.email}</span></div>
+                <span style={{ background: '#f3f4f6', padding: '4px 8px', borderRadius: '4px', fontSize: '12px', textTransform: 'uppercase' }}>{s.rol}</span>
+              </div>
+            ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
 
-/* ============================================================
-   MÓDULO CLIENTES (Agente selecciona o crea)
-   ============================================================ */
-function ClientesModule({ clientes, setClientes, selectedCliente, onSelect }) {
+function UserManagementModule({ user, usuarios, setUsuarios }) {
+  const [form, setForm] = useState({ nombre: '', email: '', password: '123' });
+
+  const handleCreate = (e) => {
+    e.preventDefault();
+    if (!form.nombre || !form.email) return;
+
+    let nuevoRol = '';
+    if (user.rol === 'gerente') nuevoRol = 'jefe';
+    else if (user.rol === 'jefe') nuevoRol = 'agente';
+    else return; // Agentes no dan de alta personal
+
+    const nuevoUsuario = {
+      id: Date.now(),
+      nombre: form.nombre,
+      email: form.email,
+      password: form.password,
+      rol: nuevoRol,
+      creadoPor: user.id
+    };
+
+    setUsuarios([...usuarios, nuevoUsuario]);
+    setForm({ nombre: '', email: '', password: '123' });
+    alert(`${nuevoRol.toUpperCase()} creado exitosamente.`);
+  };
+
+  if (user.rol === 'agente') return null;
+
+  const subordinados = usuarios.filter(u => u.creadoPor === user.id);
+
+  return (
+    <div className="grid">
+      <div className="card">
+        <div className="card-header"><span className="card-title">Dar de Alta Nuevo {user.rol === 'gerente' ? 'Jefe' : 'Agente'}</span></div>
+        <form onSubmit={handleCreate}>
+          <div className="form-group">
+            <label className="form-label">Nombre Completo</label>
+            <input className="form-input" value={form.nombre} onChange={e => setForm({...form, nombre: e.target.value})} placeholder="Ej. Juan Pérez" />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Correo Electrónico</label>
+            <input className="form-input" type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} placeholder="correo@travelpro.com" />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Contraseña (por defecto: 123)</label>
+            <input className="form-input" value={form.password} disabled style={{ background: '#f3f4f6' }} />
+          </div>
+          <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Crear {user.rol === 'gerente' ? 'Jefe' : 'Agente'}</button>
+        </form>
+      </div>
+
+      <div className="card">
+        <div className="card-header"><span className="card-title">Personal a mi cargo</span></div>
+        {subordinados.length === 0 ? <p style={{ color: '#6b7280' }}>No has dado de alta a nadie aún.</p> : null}
+        {subordinados.map(s => (
+          <div key={s.id} className="list-item">
+            <div><strong>{s.nombre}</strong><br/><span style={{ fontSize: '13px', color: '#6b7280' }}>{s.email}</span></div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ClientManagementModule({ user, clientes, setClientes }) {
   const [form, setForm] = useState({ nombre: '', email: '', telefono: '' });
 
-  const add = () => {
+  const handleCreate = (e) => {
+    e.preventDefault();
     if (!form.nombre) return;
-    const nuevo = { idCliente: Date.now(), ...form };
+    const nuevo = { idCliente: Date.now(), ...form, idAgente: user.id };
     setClientes([...clientes, nuevo]);
     setForm({ nombre: '', email: '', telefono: '' });
   };
+
+  const misClientes = clientes.filter(c => c.idAgente === user.id);
 
   return (
     <div className="grid">
       <div className="card">
         <div className="card-header"><span className="card-title">Registrar Nuevo Cliente</span></div>
-        <div className="form-group">
-          <label className="form-label">Nombre</label>
-          <input className="form-input" value={form.nombre} onChange={e => setForm({...form, nombre: e.target.value})} />
-        </div>
-        <div className="form-group">
-          <label className="form-label">Email</label>
-          <input className="form-input" value={form.email} onChange={e => setForm({...form, email: e.target.value})} />
-        </div>
-        <div className="form-group">
-          <label className="form-label">Teléfono</label>
-          <input className="form-input" value={form.telefono} onChange={e => setForm({...form, telefono: e.target.value})} />
-        </div>
-        <button className="btn btn-primary" onClick={add}>Guardar Cliente</button>
-      </div>
-
-      <div className="card">
-        <div className="card-header"><span className="card-title">Seleccionar Cliente Activo</span></div>
-        {clientes.map(c => (
-          <div key={c.idCliente} className={`row-data ${selectedCliente?.idCliente === c.idCliente ? 'highlight' : ''}`} style={{ padding: '12px', cursor: 'pointer' }} onClick={() => onSelect(c)}>
-            <div>
-              <strong>{c.nombre}</strong><br/>
-              <span style={{ fontSize: '12px', color: '#718096' }}>{c.email}</span>
-            </div>
-            {selectedCliente?.idCliente === c.idCliente && <span className="badge-info">Seleccionado</span>}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ============================================================
-   MÓDULO PLAN DE VIAJE (Cabecera)
-   ============================================================ */
-function PlanModule({ selectedCliente, plan, setPlan }) {
-  if (!selectedCliente) return <div className="card">Por favor, selecciona un cliente en la pestaña anterior.</div>;
-
-  return (
-    <div className="card">
-      <div className="card-header">
-        <span className="card-title">Plan de Viaje para: {selectedCliente.nombre}</span>
-        {plan && <span className="badge-info">ID Plan: {plan.idPlan}</span>}
-      </div>
-      
-      {!plan ? (
-        <div>
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">Destino</label>
-              <input className="form-input" placeholder="Ej. París" id="destino" />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Noches</label>
-              <input className="form-input" type="number" placeholder="5" id="noches" />
-            </div>
-          </div>
-          <button className="btn btn-primary" onClick={() => {
-            const destino = document.getElementById('destino').value;
-            const noches = document.getElementById('noches').value;
-            if (destino && noches) setPlan({ idPlan: Date.now(), destino, noches });
-          }}>Generar Plan e Iniciar Búsqueda</button>
-        </div>
-      ) : (
-        <div>
-          <p><strong>Destino:</strong> {plan.destino}</p>
-          <p><strong>Noches:</strong> {plan.noches}</p>
-          <button className="btn btn-secondary btn-sm" onClick={() => setPlan(null)}>Modificar Datos</button>
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* ============================================================
-   MÓDULO VUELOS (Simulando Amadeus)
-   ============================================================ */
-function VuelosModule({ plan, reservaVuelo, onSelect }) {
-  if (!plan) return <div className="card">Primero debes generar el Plan de Viaje.</div>;
-
-  return (
-    <div className="grid">
-      {AMADEUS_VUELOS.map(v => {
-        const isSelected = reservaVuelo?.idVuelo === v.idVuelo;
-        return (
-          <div key={v.idVuelo} className={`card ${isSelected ? 'highlight' : ''}`}>
-            <div className="card-header">
-              <span className="card-title">{v.aerolinea}</span>
-              <span className="badge-info">Amadeus ID</span>
-            </div>
-            <div className="price">${v.precioMXN.toLocaleString()} MXN</div>
-            <div className="row-data"><span>Duración:</span> <span>{v.duracionIda}</span></div>
-            <div className="row-data"><span>Escalas:</span> <span>{v.escalas}</span></div>
-            <div className="row-data"><span>Visa:</span> <span>{v.requiereVisa ? 'Sí (Canadá)' : 'No'}</span></div>
-            
-            {isSelected ? (
-              <div style={{ marginTop: '15px', background: '#c6f6d5', padding: '10px', borderRadius: '8px' }}>
-                <strong>✓ Apartado con Amadeus</strong><br/>
-                <small>Order ID: {reservaVuelo.orderId}</small><br/>
-                <small>Expira: {reservaVuelo.fechaExpiracion}</small>
-              </div>
-            ) : (
-              <button className="btn btn-primary" style={{ width: '100%', marginTop: '15px' }} onClick={() => onSelect(v)}>
-                Apartar Vuelo (Amadeus)
-              </button>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-/* ============================================================
-   MÓDULO HOSPEDAJES (Simulando Amadeus)
-   ============================================================ */
-function HospedajesModule({ plan, reservaHospedaje, onSelect }) {
-  if (!plan) return <div className="card">Primero debes generar el Plan de Viaje.</div>;
-
-  return (
-    <div className="grid">
-      {AMADEUS_HOSPEDAJES.map(h => {
-        const isSelected = reservaHospedaje?.idHotel === h.idHotel;
-        return (
-          <div key={h.idHotel} className={`card ${isSelected ? 'highlight' : ''}`}>
-            <div className="card-header">
-              <span className="card-title">{h.nombre}</span>
-            </div>
-            <div className="price">${h.precioMXN.toLocaleString()} MXN</div>
-            <div className="row-data"><span>Camas:</span> <span>{h.camas}</span></div>
-            <div className="row-data"><span>Baños:</span> <span>{h.banios}</span></div>
-            
-            {isSelected ? (
-              <div style={{ marginTop: '15px', background: '#c6f6d5', padding: '10px', borderRadius: '8px' }}>
-                <strong>✓ Apartado con Amadeus</strong><br/>
-                <small>Order ID: {reservaHospedaje.orderId}</small><br/>
-                <small>Expira: {reservaHospedaje.fechaExpiracion}</small>
-              </div>
-            ) : (
-              <button className="btn btn-primary" style={{ width: '100%', marginTop: '15px' }} onClick={() => onSelect(h)}>
-                Apartar Hospedaje (Amadeus)
-              </button>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-/* ============================================================
-   MÓDULO ITINERARIO / ATRACCIONES Y TRANSPORTE
-   ============================================================ */
-function ItinerarioModule({ plan, atracciones, setAtracciones, transporte, setTransporte }) {
-  if (!plan) return <div className="card">Primero debes generar el Plan de Viaje.</div>;
-
-  const toggleAtraccion = (atr) => {
-    if (atracciones.find(a => a.idAtraccion === atr.idAtraccion)) {
-      setAtracciones(atracciones.filter(a => a.idAtraccion !== atr.idAtraccion));
-    } else {
-      setAtracciones([...atracciones, atr]);
-    }
-  };
-
-  return (
-    <div className="grid">
-      <div className="card">
-        <div className="card-header"><span className="card-title">Atracciones Turísticas</span></div>
-        {ATRACCIONES.map(a => {
-          const isSelected = atracciones.find(x => x.idAtraccion === a.idAtraccion);
-          return (
-            <div key={a.idAtraccion} className="row-data">
-              <div>
-                <strong>{a.nombre}</strong><br/>
-                <small>${a.precioMXN} MXN</small>
-              </div>
-              <button className={`btn btn-sm ${isSelected ? 'btn-danger' : 'btn-secondary'}`} onClick={() => toggleAtraccion(a)}>
-                {isSelected ? 'Quitar' : 'Agregar'}
-              </button>
-            </div>
-          );
-        })}
-      </div>
-
-      <div className="card">
-        <div className="card-header"><span className="card-title">Transporte Local</span></div>
-        {TRANSPORTE_LOCAL.map(t => (
-          <div key={t.idTransporte} className={`row-data ${transporte?.idTransporte === t.idTransporte ? 'highlight' : ''}`} style={{ padding: '10px' }}>
-            <div>
-              <strong>{t.tipo}</strong><br/>
-              <small>${t.precioMXN} MXN (por persona)</small>
-            </div>
-            <button className="btn btn-secondary btn-sm" onClick={() => setTransporte(t)}>
-              {transporte?.idTransporte === t.idTransporte ? 'Seleccionado' : 'Seleccionar'}
-            </button>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ============================================================
-   MÓDULO VIAJEROS Y GASTOS EXTRAS
-   ============================================================ */
-function ViajerosModule({ viajeros, setViajeros, gastosExtras, setGastosExtras }) {
-  const [form, setForm] = useState({ nombre: '', email: '' });
-
-  const addViajero = () => {
-    if (!form.nombre) return;
-    setViajeros([...viajeros, { idViajero: Date.now(), ...form }]);
-    setForm({ nombre: '', email: '' });
-  };
-
-  const addGasto = (idViajero, cat) => {
-    setGastosExtras([...gastosExtras, { idGasto: Date.now(), idViajero, ...cat }]);
-  };
-
-  return (
-    <div className="grid">
-      <div className="card">
-        <div className="card-header"><span className="card-title">Registrar Viajero</span></div>
-        <div className="form-row">
+        <form onSubmit={handleCreate}>
           <div className="form-group">
             <label className="form-label">Nombre</label>
             <input className="form-input" value={form.nombre} onChange={e => setForm({...form, nombre: e.target.value})} />
           </div>
           <div className="form-group">
             <label className="form-label">Email</label>
-            <input className="form-input" value={form.email} onChange={e => setForm({...form, email: e.target.value})} />
+            <input className="form-input" type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} />
           </div>
-        </div>
-        <button className="btn btn-primary btn-sm" onClick={addViajero}>Añadir Viajero</button>
-
-        <div style={{ marginTop: '20px' }}>
-          {viajeros.map(v => (
-            <div key={v.idViajero} style={{ background: '#f7fafc', padding: '10px', marginBottom: '10px', borderRadius: '8px' }}>
-              <strong>{v.nombre}</strong>
-              <div style={{ display: 'flex', gap: '5px', marginTop: '10px', flexWrap: 'wrap' }}>
-                {GASTOS_CATALOGO.map((g, i) => (
-                  <button key={i} className="btn btn-secondary btn-sm" onClick={() => addGasto(v.idViajero, g)}>
-                    + {g.tipo} (${g.costoMXN})
-                  </button>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
+          <div className="form-group">
+            <label className="form-label">Teléfono</label>
+            <input className="form-input" value={form.telefono} onChange={e => setForm({...form, telefono: e.target.value})} />
+          </div>
+          <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Guardar Cliente</button>
+        </form>
       </div>
 
       <div className="card">
-        <div className="card-header"><span className="card-title">Gastos Extras Registrados</span></div>
-        {gastosExtras.length === 0 ? <p style={{ color: '#718096' }}>No hay gastos.</p> : null}
-        {gastosExtras.map(g => {
-          const v = viajeros.find(x => x.idViajero === g.idViajero);
-          return (
-            <div key={g.idGasto} className="row-data">
-              <span>{v?.nombre}: {g.tipo} - {g.descripcion}</span>
-              <strong>${g.costoMXN}</strong>
-            </div>
-          );
-        })}
+        <div className="card-header"><span className="card-title">Mi Cartera de Clientes</span></div>
+        {misClientes.length === 0 ? <p style={{ color: '#6b7280' }}>Aún no tienes clientes.</p> : null}
+        {misClientes.map(c => (
+          <div key={c.idCliente} className="list-item">
+            <div><strong>{c.nombre}</strong><br/><span style={{ fontSize: '13px', color: '#6b7280' }}>{c.email}</span></div>
+          </div>
+        ))}
       </div>
     </div>
   );
 }
 
 /* ============================================================
-   MÓDULO COTIZACIÓN FINAL
+   MÓDULOS DE COTIZACIÓN (Agente)
    ============================================================ */
-function CotizacionModule({ plan, reservaVuelo, reservaHospedaje, transporte, atracciones, viajeros, gastosExtras }) {
-  if (!plan) return <div className="card">Falta generar el Plan de Viaje.</div>;
+function CotizacionFlow({ user, clientes, setClientes }) {
+  const [step, setStep] = useState(1);
+  const [selectedClient, setSelectedClient] = useState(null);
+  const [planData, setPlanData] = useState({ destino: '', noches: 1, paisFiltro: 'Todos' });
+  const [reservaVuelo, setReservaVuelo] = useState(null);
+  const [reservaHospedaje, setReservaHospedaje] = useState(null);
 
-  const n = viajeros.length || 1;
-  
-  const totalVuelos = reservaVuelo ? reservaVuelo.precioMXN * n : 0;
-  const totalHospedaje = reservaHospedaje ? reservaHospedaje.precioMXN : 0;
-  const totalTransporte = transporte ? transporte.precioMXN * n : 0;
-  const totalAtracciones = atracciones.reduce((sum, a) => sum + (a.precioMXN * n), 0);
-  
-  const totalCompartido = totalVuelos + totalHospedaje + totalTransporte + totalAtracciones;
-  const compartidoPorPersona = totalCompartido / n;
+  const misClientes = clientes.filter(c => c.idAgente === user.id);
 
-  const totalGastosExtras = gastosExtras.reduce((sum, g) => sum + g.costoMXN, 0);
-  const totalGrupo = totalCompartido + totalGastosExtras;
-  
-  const comision = totalGrupo * 0.10; // 10% comisión agencia
-  const totalFinal = totalGrupo + comision;
+  const handleApartarVuelo = (vuelo) => {
+    const orderId = 'AMD-V' + Math.random().toString(36).substr(2, 6).toUpperCase();
+    setReservaVuelo({ ...vuelo, orderId });
+  };
+
+  const handleApartarHospedaje = (hotel) => {
+    const orderId = 'AMD-H' + Math.random().toString(36).substr(2, 6).toUpperCase();
+    setReservaHospedaje({ ...hotel, orderId });
+  };
 
   return (
     <div>
-      <div className="card">
-        <div className="card-header"><span className="card-title">Resumen de Reservas (Amadeus)</span></div>
-        <div className="row-data"><span>Vuelo ({reservaVuelo?.aerolinea || 'No seleccionado'})</span><strong>${totalVuelos.toLocaleString()}</strong></div>
-        <div className="row-data"><span>Hospedaje ({reservaHospedaje?.nombre || 'No seleccionado'})</span><strong>${totalHospedaje.toLocaleString()}</strong></div>
-        <div className="row-data"><span>Transporte ({transporte?.tipo || 'No seleccionado'})</span><strong>${totalTransporte.toLocaleString()}</strong></div>
-        <div className="row-data"><span>Atracciones ({atracciones.length} seleccionadas)</span><strong>${totalAtracciones.toLocaleString()}</strong></div>
-        <div className="row-data" style={{ borderTop: '2px solid #1e3a8a', marginTop: '10px', paddingTop: '10px' }}>
-          <strong>Costo Compartido</strong><strong>${totalCompartido.toLocaleString()}</strong>
-        </div>
-        <div className="row-data"><span>Costo por persona (Compartido)</span><span>${compartidoPorPersona.toFixed(2)}</span></div>
-      </div>
-
-      <div className="card">
-        <div className="card-header"><span className="card-title">Gastos Extras (Individuales)</span></div>
-        {gastosExtras.length === 0 ? <p>Sin gastos extras.</p> : null}
-        {gastosExtras.map(g => (
-          <div key={g.idGasto} className="row-data"><span>{g.tipo} - {g.descripcion}</span><strong>${g.costoMXN}</strong></div>
+      {/* STEPPER VISUAL */}
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '24px' }}>
+        {[1, 2, 3].map(s => (
+          <div key={s} style={{ flex: 1, height: '6px', background: step >= s ? '#3b82f6' : '#e5e7eb', borderRadius: '10px' }}></div>
         ))}
       </div>
 
-      <div className="summary-total">
-        <div style={{ fontSize: '14px', opacity: 0.9 }}>COTIZACIÓN FINAL (CON 10% COMISIÓN)</div>
-        <div className="amount">${totalFinal.toLocaleString()} MXN</div>
-        <div style={{ fontSize: '14px', opacity: 0.9, marginTop: '5px' }}>Subtotal: ${totalGrupo.toLocaleString()} + Comisión: ${comision.toLocaleString()}</div>
-      </div>
-      
-      <button className="btn btn-primary" onClick={() => window.print()} style={{ width: '100%', padding: '15px', fontSize: '16px' }}>
-        🖨️ Exportar Cotización a PDF
-      </button>
+      {step === 1 && (
+        <div className="card">
+          <div className="card-header"><span className="card-title">Paso 1: Seleccionar Cliente y Destino</span></div>
+          <div className="form-group">
+            <label className="form-label">Cliente</label>
+            <select className="form-input" onChange={e => setSelectedClient(misClientes.find(c => c.idCliente === Number(e.target.value)))}>
+              <option value="">Selecciona un cliente...</option>
+              {misClientes.map(c => <option key={c.idCliente} value={c.idCliente}>{c.nombre}</option>)}
+            </select>
+          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">País de Destino</label>
+              <select className="form-input" onChange={e => setPlanData({...planData, paisFiltro: e.target.value})}>
+                {PAISES.map(p => <option key={p} value={p}>{p}</option>)}
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Ciudad / Destino</label>
+              <input className="form-input" placeholder="Ej. París" onChange={e => setPlanData({...planData, destino: e.target.value})} />
+            </div>
+          </div>
+          <button className="btn btn-primary" onClick={() => setStep(2)} disabled={!selectedClient || !planData.destino}>Continuar a Vuelos</button>
+        </div>
+      )}
+
+      {step === 2 && (
+        <div>
+          <button className="btn btn-secondary btn-sm" onClick={() => setStep(1)} style={{ marginBottom: '16px' }}>← Volver</button>
+          <div className="card">
+            <div className="card-header">
+              <span className="card-title">Paso 2: Vuelos a {planData.paisFiltro}</span>
+            </div>
+            <div className="grid">
+              {AMADEUS_VUELOS.filter(v => planData.paisFiltro === 'Todos' || v.pais === planData.paisFiltro).map(v => {
+                const isSelected = reservaVuelo?.idVuelo === v.idVuelo;
+                return (
+                  <div key={v.idVuelo} className={`card ${isSelected ? 'selected-border' : ''}`} style={{ marginBottom: 0 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+                      <strong>{v.aerolinea}</strong>
+                      <span className="price-tag">${v.precioMXN.toLocaleString()}</span>
+                    </div>
+                    <div style={{ fontSize: '13px', color: '#6b7280', marginBottom: '16px' }}>
+                      ⏱ {v.duracion} · Escalas: {v.escalas}
+                    </div>
+                    {isSelected ? (
+                      <div style={{ background: '#ecfdf5', color: '#065f46', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
+                        ✓ Apartado en Amadeus<br/>Order ID: <b>{reservaVuelo.orderId}</b>
+                      </div>
+                    ) : (
+                      <button className="btn btn-primary btn-sm" style={{ width: '100%' }} onClick={() => handleApartarVuelo(v)}>Apartar Vuelo</button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="card">
+            <div className="card-header"><span className="card-title">Paso 3: Hospedajes en {planData.paisFiltro}</span></div>
+            <div className="grid">
+              {AMADEUS_HOSPEDAJES.filter(h => planData.paisFiltro === 'Todos' || h.pais === planData.paisFiltro).map(h => {
+                const isSelected = reservaHospedaje?.idHotel === h.idHotel;
+                return (
+                  <div key={h.idHotel} className={`card ${isSelected ? 'selected-border' : ''}`} style={{ marginBottom: 0 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+                      <strong>{h.nombre}</strong>
+                      <span className="price-tag">${h.precioMXN.toLocaleString()}</span>
+                    </div>
+                    <div style={{ fontSize: '13px', color: '#6b7280', marginBottom: '16px' }}>
+                      🛏 {h.camas} camas
+                    </div>
+                    {isSelected ? (
+                      <div style={{ background: '#ecfdf5', color: '#065f46', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
+                        ✓ Apartado en Amadeus<br/>Order ID: <b>{reservaHospedaje.orderId}</b>
+                      </div>
+                    ) : (
+                      <button className="btn btn-primary btn-sm" style={{ width: '100%' }} onClick={() => handleApartarHospedaje(h)}>Apartar Hospedaje</button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div style={{ textAlign: 'right' }}>
+            <button className="btn btn-primary" onClick={() => setStep(3)} disabled={!reservaVuelo || !reservaHospedaje}>Continuar a Presupuesto →</button>
+          </div>
+        </div>
+      )}
+
+      {step === 3 && (
+        <div>
+          <button className="btn btn-secondary btn-sm" onClick={() => setStep(2)} style={{ marginBottom: '16px' }}>← Volver</button>
+          <div className="card">
+            <div className="card-header"><span className="card-title">Resumen de Cotización</span></div>
+            <div className="list-item">
+              <span>Vuelo {reservaVuelo.aerolinea} (1 pax)</span>
+              <strong>${reservaVuelo.precioMXN.toLocaleString()}</strong>
+            </div>
+            <div className="list-item">
+              <span>Hospedaje {reservaHospedaje.nombre}</span>
+              <strong>${reservaHospedaje.precioMXN.toLocaleString()}</strong>
+            </div>
+            
+            <div style={{ marginTop: '24px', padding: '24px', background: '#1e3a8a', color: 'white', borderRadius: '16px' }}>
+              <div style={{ fontSize: '14px', opacity: 0.8 }}>TOTAL COTIZADO</div>
+              <div style={{ fontSize: '32px', fontWeight: '800' }}>${(reservaVuelo.precioMXN + reservaHospedaje.precioMXN).toLocaleString()} MXN</div>
+              <div style={{ fontSize: '12px', marginTop: '8px', opacity: 0.8 }}>Cliente: {selectedClient.nombre} | Destino: {planData.destino}</div>
+            </div>
+            
+            <button className="btn btn-primary" onClick={() => window.print()} style={{ width: '100%', marginTop: '16px' }}>
+              🖨️ Imprimir Cotización
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -525,85 +487,72 @@ function CotizacionModule({ plan, reservaVuelo, reservaHospedaje, transporte, at
 function App() {
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('dashboard');
+  
+  const [usuarios, setUsuarios] = useState(INITIAL_USUARIOS);
+  const [clientes, setClientes] = useState(INITIAL_CLIENTES);
 
-  // Datos del Plan
-  const [clientes, setClientes] = useState(CLIENTES);
-  const [selectedCliente, setSelectedCliente] = useState(null);
-  const [plan, setPlan] = useState(null);
-  
-  // Reservas Amadeus
-  const [reservaVuelo, setReservaVuelo] = useState(null);
-  const [reservaHospedaje, setReservaHospedaje] = useState(null);
-  
-  // Itinerario
-  const [atracciones, setAtracciones] = useState([]);
-  const [transporte, setTransporte] = useState(null);
-  
-  // Viajeros
-  const [viajeros, setViajeros] = useState([]);
-  const [gastosExtras, setGastosExtras] = useState([]);
+  if (!user) return <LoginScreen onLogin={setUser} usuarios={usuarios} />;
 
-  // Handlers para simular Amadeus
-  const handleApartarVuelo = (vuelo) => {
-    const orderId = 'AMD-V' + Math.random().toString(36).substr(2, 9).toUpperCase();
-    const exp = new Date();
-    exp.setDate(exp.getDate() + 2); // Expira en 2 días
-    setReservaVuelo({ ...vuelo, orderId, fechaExpiracion: exp.toLocaleDateString(), estado: 'apartado' });
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'dashboard': return <DashboardModule user={user} usuarios={usuarios} clientes={clientes} />;
+      case 'usuarios': return <UserManagementModule user={user} usuarios={usuarios} setUsuarios={setUsuarios} />;
+      case 'clientes': return <ClientManagementModule user={user} clientes={clientes} setClientes={setClientes} />;
+      case 'cotizacion': return <CotizacionFlow user={user} clientes={clientes} setClientes={setClientes} />;
+      default: return <DashboardModule user={user} usuarios={usuarios} clientes={clientes} />;
+    }
   };
-
-  const handleApartarHospedaje = (hotel) => {
-    const orderId = 'AMD-H' + Math.random().toString(36).substr(2, 9).toUpperCase();
-    const exp = new Date();
-    exp.setDate(exp.getDate() + 2);
-    setReservaHospedaje({ ...hotel, orderId, fechaExpiracion: exp.toLocaleDateString(), estado: 'apartado' });
-  };
-
-  const tabs = [
-    { id: 'dashboard', label: '🏢 Dashboard', roles: ['gerente', 'jefe'] },
-    { id: 'clientes', label: '👤 1. Clientes', roles: ['agente'] },
-    { id: 'plan', label: '🗺️ 2. Plan de Viaje', roles: ['agente'] },
-    { id: 'vuelos', label: '✈️ 3. Vuelos', roles: ['agente'] },
-    { id: 'hospedajes', label: '🏨 4. Hospedaje', roles: ['agente'] },
-    { id: 'itinerario', label: '🎢 5. Itinerario', roles: ['agente'] },
-    { id: 'viajeros', label: '👥 6. Viajeros/Gastos', roles: ['agente'] },
-    { id: 'cotizacion', label: '📄 7. Cotización', roles: ['agente'] },
-  ];
-
-  if (!user) return <LoginScreen onLogin={setUser} />;
 
   return (
     <>
       <style>{globalCSS}</style>
-      <div className="app">
-        <header className="header">
-          <h1>✈️ TravelPro - Agencia de Viajes</h1>
-          <div className="user-info">
-            <span>{user.nombre}</span>
-            <span className="badge-rol">{user.rol}</span>
-            <button className="logout-btn" onClick={() => { setUser(null); setActiveTab('dashboard'); }}>Salir</button>
+      <div className="app-container">
+        {/* SIDEBAR */}
+        <aside className="sidebar">
+          <div className="sidebar-logo">
+            ✈️ TravelPro
           </div>
-        </header>
-
-        <div className="container">
-          <div className="tabs">
-            {tabs.filter(t => t.roles.includes(user.rol)).map(t => (
-              <button key={t.id} className={`tab ${activeTab === t.id ? 'active' : ''}`} onClick={() => setActiveTab(t.id)}>
-                {t.label}
+          <div className="sidebar-menu">
+            <button className={`menu-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>
+              📊 Dashboard
+            </button>
+            
+            {(user.rol === 'gerente' || user.rol === 'jefe') && (
+              <button className={`menu-item ${activeTab === 'usuarios' ? 'active' : ''}`} onClick={() => setActiveTab('usuarios')}>
+                👥 Dar de alta {user.rol === 'gerente' ? 'Jefes' : 'Agentes'}
               </button>
-            ))}
-          </div>
+            )}
 
-          {activeTab === 'dashboard' && <DashboardModule user={user} />}
-          
-          {/* Flujo del Agente */}
-          {activeTab === 'clientes' && <ClientesModule clientes={clientes} setClientes={setClientes} selectedCliente={selectedCliente} onSelect={setSelectedCliente} />}
-          {activeTab === 'plan' && <PlanModule selectedCliente={selectedCliente} plan={plan} setPlan={setPlan} />}
-          {activeTab === 'vuelos' && <VuelosModule plan={plan} reservaVuelo={reservaVuelo} onSelect={handleApartarVuelo} />}
-          {activeTab === 'hospedajes' && <HospedajesModule plan={plan} reservaHospedaje={reservaHospedaje} onSelect={handleApartarHospedaje} />}
-          {activeTab === 'itinerario' && <ItinerarioModule plan={plan} atracciones={atracciones} setAtracciones={setAtracciones} transporte={transporte} setTransporte={setTransporte} />}
-          {activeTab === 'viajeros' && <ViajerosModule viajeros={viajeros} setViajeros={setViajeros} gastosExtras={gastosExtras} setGastosExtras={setGastosExtras} />}
-          {activeTab === 'cotizacion' && <CotizacionModule plan={plan} reservaVuelo={reservaVuelo} reservaHospedaje={reservaHospedaje} transporte={transporte} atracciones={atracciones} viajeros={viajeros} gastosExtras={gastosExtras} />}
-        </div>
+            {user.rol === 'agente' && (
+              <>
+                <button className={`menu-item ${activeTab === 'clientes' ? 'active' : ''}`} onClick={() => setActiveTab('clientes')}>
+                  🙋‍♂️ Mis Clientes
+                </button>
+                <button className={`menu-item ${activeTab === 'cotizacion' ? 'active' : ''}`} onClick={() => setActiveTab('cotizacion')}>
+                  💼 Nueva Cotización
+                </button>
+              </>
+            )}
+          </div>
+        </aside>
+
+        {/* MAIN CONTENT */}
+        <main className="main-content">
+          <header className="topbar">
+            <h1>Panel de Control</h1>
+            <div className="user-profile">
+              <span className="role-badge">{user.rol}</span>
+              <span style={{ fontWeight: '600', fontSize: '14px' }}>{user.nombre}</span>
+              <button className="btn-logout" onClick={() => { setUser(null); setActiveTab('dashboard'); }}>
+                Salir
+              </button>
+            </div>
+          </header>
+
+          <div className="content-area">
+            {renderContent()}
+          </div>
+        </main>
       </div>
     </>
   );
