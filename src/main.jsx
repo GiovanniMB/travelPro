@@ -1,141 +1,112 @@
 // main.jsx
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
 /* ============================================================
-   DATOS SIMULADOS GLOBALES (AMADEUS)
+   1. DATOS GLOBALES (AMADEUS Y CATÁLOGOS)
    ============================================================ */
-const PAISES = [
-  'Todos', 'México', 'Estados Unidos', 'Brasil', 'Reino Unido', 
-  'Francia', 'España', 'Italia', 'Japón', 'Australia', 'Egipto'
-];
-
 const AMADEUS_VUELOS = [
-  // América
-  { idVuelo: 'AM-V1', pais: 'México', aerolinea: 'Aeroméxico', precioMXN: 4500, duracion: '2h 30m', escalas: 0 },
-  { idVuelo: 'AM-V2', pais: 'Estados Unidos', aerolinea: 'American Airlines', precioMXN: 8500, duracion: '4h 30m', escalas: 0 },
-  { idVuelo: 'AM-V3', pais: 'Brasil', aerolinea: 'LATAM', precioMXN: 12000, duracion: '9h 45m', escalas: 1 },
-  // Europa
-  { idVuelo: 'AM-V4', pais: 'Reino Unido', aerolinea: 'British Airways', precioMXN: 14500, duracion: '10h 20m', escalas: 0 },
-  { idVuelo: 'AM-V5', pais: 'Francia', aerolinea: 'Air France', precioMXN: 15000, duracion: '11h 00m', escalas: 0 },
-  { idVuelo: 'AM-V6', pais: 'España', aerolinea: 'Iberia', precioMXN: 13500, duracion: '10h 15m', escalas: 0 },
-  { idVuelo: 'AM-V7', pais: 'Italia', aerolinea: 'Alitalia', precioMXN: 16000, duracion: '12h 30m', escalas: 1 },
-  // Asia y Oceanía
-  { idVuelo: 'AM-V8', pais: 'Japón', aerolinea: 'ANA', precioMXN: 28000, duracion: '18h 45m', escalas: 1 },
-  { idVuelo: 'AM-V9', pais: 'Australia', aerolinea: 'Qantas', precioMXN: 32000, duracion: '22h 10m', escalas: 2 },
-  // África
-  { idVuelo: 'AM-V10', pais: 'Egipto', aerolinea: 'EgyptAir', precioMXN: 19500, duracion: '15h 30m', escalas: 1 },
+  { idVuelo: 'V1', pais: 'Francia', aerolinea: 'Air France', precioMXN: 15000, duracion: '11h', escalas: 0 },
+  { idVuelo: 'V2', pais: 'España', aerolinea: 'Iberia', precioMXN: 13500, duracion: '10h', escalas: 0 },
+  { idVuelo: 'V3', pais: 'Japón', aerolinea: 'ANA', precioMXN: 28000, duracion: '18h', escalas: 1 },
+  { idVuelo: 'V4', pais: 'Estados Unidos', aerolinea: 'American Airlines', precioMXN: 8500, duracion: '4h', escalas: 0 },
+  { idVuelo: 'V5', pais: 'México', aerolinea: 'Aeroméxico', precioMXN: 4500, duracion: '2h', escalas: 0 },
 ];
 
 const AMADEUS_HOSPEDAJES = [
-  // América
-  { idHotel: 'AM-H1', pais: 'México', nombre: 'Hotel Geneve CDMX', precioMXN: 3500, camas: 2 },
-  { idHotel: 'AM-H2', pais: 'Estados Unidos', nombre: 'The Manhattan Times Square', precioMXN: 18000, camas: 2 },
-  { idHotel: 'AM-H3', pais: 'Brasil', nombre: 'Copacabana Palace', precioMXN: 9500, camas: 2 },
-  // Europa
-  { idHotel: 'AM-H4', pais: 'Reino Unido', nombre: 'The Savoy London', precioMXN: 22000, camas: 2 },
-  { idHotel: 'AM-H5', pais: 'Francia', nombre: 'Generator Paris Hostel', precioMXN: 4500, camas: 4 },
-  { idHotel: 'AM-H6', pais: 'España', nombre: 'Hotel Riu Madrid', precioMXN: 8000, camas: 3 },
-  { idHotel: 'AM-H7', pais: 'Italia', nombre: 'Hotel Artemide Roma', precioMXN: 11000, camas: 2 },
-  // Asia y Oceanía
-  { idHotel: 'AM-H8', pais: 'Japón', nombre: 'Shinjuku Granbell Hotel', precioMXN: 12000, camas: 2 },
-  { idHotel: 'AM-H9', pais: 'Australia', nombre: 'Sydney Harbour YHA', precioMXN: 8500, camas: 4 },
-  // África
-  { idHotel: 'AM-H10', pais: 'Egipto', nombre: 'Pyramids View Inn', precioMXN: 4000, camas: 2 },
+  { idHotel: 'H1', pais: 'Francia', nombre: 'Hotel Ritz Paris', precioMXN: 25000, camas: 2 },
+  { idHotel: 'H2', pais: 'España', nombre: 'Hotel Riu Madrid', precioMXN: 8000, camas: 3 },
+  { idHotel: 'H3', pais: 'Japón', nombre: 'Shinjuku Granbell Hotel', precioMXN: 12000, camas: 2 },
+  { idHotel: 'H4', pais: 'Estados Unidos', nombre: 'The Manhattan Times Square', precioMXN: 18000, camas: 2 },
+  { idHotel: 'H5', pais: 'México', nombre: 'Hotel Geneve CDMX', precioMXN: 3500, camas: 2 },
 ];
 
-/* ============================================================
-   ESTADO INICIAL DE USUARIOS Y CLIENTES
-   ============================================================ */
+const ATRACCIONES_DB = [
+  { idAtraccion: 'A1', pais: 'Francia', nombre: 'Museo del Louvre', precioMXN: 400 },
+  { idAtraccion: 'A2', pais: 'Francia', nombre: 'Torre Eiffel', precioMXN: 500 },
+  { idAtraccion: 'A3', pais: 'Japón', nombre: 'Templo Senso-ji', precioMXN: 0 },
+  { idAtraccion: 'A4', pais: 'Estados Unidos', nombre: 'Estatua de la Libertad', precioMXN: 700 },
+];
+
+const TRANSPORTE_DB = [
+  { idTransporte: 'T1', tipo: 'Pase Semanal Metro', precioMXN: 679 },
+  { idTransporte: 'T2', tipo: 'Taxi Aeropuerto-Ciudad', precioMXN: 850 },
+];
+
+const GASTOS_DB = [
+  { tipo: 'eSIM', descripcion: 'Chip de Datos', costoMXN: 337.60 },
+  { tipo: 'Adaptador', descripcion: 'Enchufe Universal', costoMXN: 253.37 },
+  { tipo: 'Visa', descripcion: 'Trámite Migratorio', costoMXN: 1400.00 },
+];
+
 const INITIAL_USUARIOS = [
   { id: 1, nombre: 'Carlos Gerente', email: 'gerente@travelpro.com', password: '123', rol: 'gerente', creadoPor: null },
   { id: 2, nombre: 'Laura Jefa', email: 'jefa@travelpro.com', password: '123', rol: 'jefe', creadoPor: 1 },
   { id: 3, nombre: 'Misael Agente', email: 'agente@travelpro.com', password: '123', rol: 'agente', creadoPor: 2 },
 ];
 
-const INITIAL_CLIENTES = [
-  { idCliente: 101, nombre: 'Juan Pérez', email: 'juan@email.com', telefono: '555-1234', idAgente: 3 },
-];
-
 /* ============================================================
-   ESTILOS GLOBALES (DISEÑO MODERNO)
+   2. ESTILOS (DISEÑO MODERNO)
    ============================================================ */
 const globalCSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-  
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
   body { background-color: #f3f4f6; color: #1f2937; }
-  
-  /* LAYOUT */
   .app-container { display: flex; height: 100vh; overflow: hidden; }
   
   /* SIDEBAR */
-  .sidebar { width: 260px; background: #ffffff; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; box-shadow: 2px 0 5px rgba(0,0,0,0.02); z-index: 10; }
-  .sidebar-logo { padding: 24px; font-size: 20px; font-weight: 700; color: #1d4ed8; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #f3f4f6; }
-  .sidebar-menu { flex: 1; padding: 20px 12px; overflow-y: auto; }
-  .menu-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 10px; color: #4b5563; font-weight: 500; font-size: 14px; cursor: pointer; transition: all 0.2s; margin-bottom: 4px; border: none; background: transparent; width: 100%; text-align: left; }
+  .sidebar { width: 260px; background: #ffffff; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; z-index: 10; }
+  .sidebar-logo { padding: 24px; font-size: 20px; font-weight: 800; color: #1d4ed8; border-bottom: 1px solid #f3f4f6; }
+  .sidebar-menu { flex: 1; padding: 20px 12px; }
+  .menu-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 10px; color: #4b5563; font-weight: 600; font-size: 14px; cursor: pointer; margin-bottom: 4px; border: none; background: transparent; width: 100%; text-align: left; transition: 0.2s; }
   .menu-item:hover { background: #eff6ff; color: #1d4ed8; }
-  .menu-item.active { background: #1d4ed8; color: white; box-shadow: 0 4px 12px rgba(29, 78, 216, 0.2); }
+  .menu-item.active { background: #1d4ed8; color: white; }
   
-  /* MAIN CONTENT */
+  /* MAIN */
   .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
-  .topbar { background: white; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e7eb; position: sticky; top: 0; z-index: 5; }
-  .topbar h1 { font-size: 18px; font-weight: 600; color: #374151; }
-  .user-profile { display: flex; align-items: center; gap: 16px; }
-  .role-badge { background: #dbeafe; color: #1e40af; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; text-transform: uppercase; }
-  .btn-logout { background: #fee2e2; color: #b91c1c; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-  .btn-logout:hover { background: #fecaca; }
-  
+  .topbar { background: white; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e7eb; }
+  .role-badge { background: #dbeafe; color: #1e40af; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+  .btn-logout { background: #fee2e2; color: #b91c1c; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; }
   .content-area { padding: 32px; max-width: 1200px; margin: 0 auto; width: 100%; }
   
-  /* CARDS */
-  .card { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); margin-bottom: 24px; border: 1px solid #f3f4f6; }
+  /* UI ELEMENTS */
+  .card { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 24px; border: 1px solid #e5e7eb; }
   .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #f3f4f6; padding-bottom: 16px; }
   .card-title { font-size: 18px; font-weight: 700; color: #111827; }
-  .grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+  .grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
   
-  /* FORMS & BUTTONS */
   .form-group { margin-bottom: 16px; }
   .form-label { display: block; font-size: 13px; font-weight: 600; color: #4b5563; margin-bottom: 8px; }
-  .form-input { width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 14px; transition: border 0.2s, box-shadow 0.2s; outline: none; }
-  .form-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+  .form-input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 14px; outline: none; }
+  .form-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   
-  .btn { padding: 12px 20px; border-radius: 10px; border: none; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
-  .btn-primary { background: #1d4ed8; color: white; box-shadow: 0 2px 4px rgba(29, 78, 216, 0.2); }
-  .btn-primary:hover { background: #1e40af; }
-  .btn-primary:disabled { background: #9ca3af; cursor: not-allowed; box-shadow: none; }
+  .btn { padding: 12px 20px; border-radius: 10px; border: none; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 14px; }
+  .btn-primary { background: #1d4ed8; color: white; }
+  .btn-primary:disabled { background: #9ca3af; cursor: not-allowed; }
   .btn-secondary { background: #f3f4f6; color: #374151; }
-  .btn-secondary:hover { background: #e5e7eb; }
-  .btn-danger { background: #fee2e2; color: #b91c1c; }
-  .btn-danger:hover { background: #fecaca; }
-  .btn-sm { padding: 8px 14px; font-size: 13px; }
+  .btn-success { background: #10b981; color: white; }
+  .btn-danger { background: #ef4444; color: white; }
+  .btn-sm { padding: 8px 12px; font-size: 12px; }
   
-  /* TABLES & LISTS */
-  .list-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-bottom: 1px solid #f3f4f6; transition: background 0.2s; }
-  .list-item:last-child { border-bottom: none; }
-  .list-item:hover { background: #f9fafb; }
+  .list-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-bottom: 1px solid #f3f4f6; }
   .price-tag { font-size: 18px; font-weight: 700; color: #059669; }
-  .selected-border { border: 2px solid #10b981; background: #ecfdf5; border-radius: 12px; }
+  .highlight { border: 2px solid #10b981; background: #ecfdf5; border-radius: 12px; }
   
-  /* DASHBOARD KPIS */
-  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 32px; }
-  .kpi-card { background: white; padding: 24px; border-radius: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-left: 4px solid #3b82f6; }
-  .kpi-title { font-size: 13px; color: #6b7280; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
-  .kpi-value { font-size: 28px; font-weight: 800; color: #111827; }
+  .stepper { display: flex; gap: 10px; margin-bottom: 30px; }
+  .step { flex: 1; height: 8px; border-radius: 10px; background: #e5e7eb; }
+  .step.active { background: #3b82f6; }
   
   /* LOGIN */
-  .login-bg { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); }
-  .login-card { background: white; padding: 40px; border-radius: 20px; width: 100%; max-width: 420px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
-  .error-msg { background: #fef2f2; color: #b91c1c; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; border: 1px solid #fecaca; }
+  .login-bg { height: 100vh; display: flex; align-items: center; justify-content: center; background: #1e3a8a; }
+  .login-card { background: white; padding: 40px; border-radius: 20px; width: 400px; }
 `;
 
 /* ============================================================
-   COMPONENTES
+   3. COMPONENTES (LOGIN Y ADMIN)
    ============================================================ */
-
 function LoginScreen({ onLogin, usuarios }) {
-  const [email, setEmail] = useState('gerente@travelpro.com');
+  const [email, setEmail] = useState('agente@travelpro.com');
   const [password, setPassword] = useState('123');
   const [error, setError] = useState('');
 
@@ -143,7 +114,7 @@ function LoginScreen({ onLogin, usuarios }) {
     e.preventDefault();
     const user = usuarios.find(u => u.email === email && u.password === password);
     if (user) onLogin(user);
-    else setError('Credenciales incorrectas. Revisa la lista de usuarios de prueba.');
+    else setError('Credenciales incorrectas.');
   };
 
   return (
@@ -151,29 +122,25 @@ function LoginScreen({ onLogin, usuarios }) {
       <style>{globalCSS}</style>
       <div className="login-bg">
         <div className="login-card">
-          <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#111827', marginBottom: '8px' }}>✈️ TravelPro B2B</h2>
-          <p style={{ color: '#6b7280', marginBottom: '32px', fontSize: '14px' }}>Portal de Gestión de Agencia</p>
-          
+          <h2 style={{ fontSize: '24px', fontWeight: '800', marginBottom: '8px' }}>✈️ TravelPro</h2>
+          <p style={{ color: '#6b7280', marginBottom: '24px', fontSize: '14px' }}>Portal B2B de Agencia</p>
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label className="form-label">Correo Corporativo</label>
-              <input className="form-input" type="email" value={email} onChange={e => setEmail(e.target.value)} />
+              <label className="form-label">Correo</label>
+              <input className="form-input" value={email} onChange={e => setEmail(e.target.value)} />
             </div>
             <div className="form-group">
               <label className="form-label">Contraseña</label>
               <input className="form-input" type="password" value={password} onChange={e => setPassword(e.target.value)} />
             </div>
-            {error && <div className="error-msg">{error}</div>}
-            <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Ingresar al Sistema</button>
+            {error && <p style={{ color: 'red', fontSize: '13px', marginBottom: '10px' }}>{error}</p>}
+            <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Ingresar</button>
           </form>
-          
-          <div style={{ marginTop: '24px', paddingTop: '24px', borderTop: '1px solid #e5e7eb', fontSize: '12px', color: '#6b7280' }}>
-            <p style={{ fontWeight: 'bold', marginBottom: '8px' }}>Usuarios de prueba (pass: 123):</p>
-            <ul style={{ listStyle: 'none', lineHeight: '1.8' }}>
-              <li>👑 Gerente: <b>gerente@travelpro.com</b></li>
-              <li>👔 Jefe: <b>jefa@travelpro.com</b></li>
-              <li>💼 Agente: <b>agente@travelpro.com</b></li>
-            </ul>
+          <div style={{ marginTop: '20px', fontSize: '12px', color: '#6b7280', background: '#f9fafb', padding: '12px', borderRadius: '8px' }}>
+            <b>Pruebas (pass: 123):</b><br/>
+            gerente@travelpro.com<br/>
+            jefa@travelpro.com<br/>
+            agente@travelpro.com
           </div>
         </div>
       </div>
@@ -181,141 +148,21 @@ function LoginScreen({ onLogin, usuarios }) {
   );
 }
 
-function DashboardModule({ user, usuarios, clientes }) {
-  const misSubordinados = usuarios.filter(u => u.creadoPor === user.id);
-  const misClientes = clientes.filter(c => c.idAgente === user.id);
-
-  return (
-    <div>
-      <div className="kpi-grid">
-        {user.rol === 'gerente' && (
-          <>
-            <div className="kpi-card"><div className="kpi-title">Personal a Cargo</div><div className="kpi-value">{misSubordinados.length}</div></div>
-            <div className="kpi-card" style={{ borderLeftColor: '#10b981' }}><div className="kpi-title">Ventas Globales</div><div className="kpi-value">$450K</div></div>
-          </>
-        )}
-        {user.rol === 'jefe' && (
-          <>
-            <div className="kpi-card"><div className="kpi-title">Agentes a Cargo</div><div className="kpi-value">{misSubordinados.length}</div></div>
-            <div className="kpi-card" style={{ borderLeftColor: '#10b981' }}><div className="kpi-title">Cotizaciones del Equipo</div><div className="kpi-value">24</div></div>
-          </>
-        )}
-        {user.rol === 'agente' && (
-          <>
-            <div className="kpi-card"><div className="kpi-title">Mis Clientes</div><div className="kpi-value">{misClientes.length}</div></div>
-            <div className="kpi-card" style={{ borderLeftColor: '#f59e0b' }}><div className="kpi-title">Planes en Curso</div><div className="kpi-value">3</div></div>
-          </>
-        )}
-      </div>
-
-      <div className="card">
-        <div className="card-header"><span className="card-title">Mi Equipo / Cartera</span></div>
-        {user.rol === 'agente' ? (
-          <div>
-            {misClientes.length === 0 ? <p style={{ color: '#6b7280' }}>Aún no tienes clientes asignados.</p> : null}
-            {misClientes.map(c => (
-              <div key={c.idCliente} className="list-item">
-                <div><strong>{c.nombre}</strong><br/><span style={{ fontSize: '13px', color: '#6b7280' }}>{c.email}</span></div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div>
-            {misSubordinados.length === 0 ? <p style={{ color: '#6b7280' }}>No tienes subordinados directos aún.</p> : null}
-            {misSubordinados.map(s => (
-              <div key={s.id} className="list-item">
-                <div><strong>{s.nombre}</strong><br/><span style={{ fontSize: '13px', color: '#6b7280' }}>{s.email}</span></div>
-                <span style={{ background: '#f3f4f6', padding: '4px 8px', borderRadius: '4px', fontSize: '12px', textTransform: 'uppercase' }}>{s.rol}</span>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function UserManagementModule({ user, usuarios, setUsuarios }) {
-  const [form, setForm] = useState({ nombre: '', email: '', password: '123', rol: 'agente' });
+function AdminUsersModule({ user, usuarios, setUsuarios }) {
+  const [form, setForm] = useState({ nombre: '', email: '', rol: 'agente' });
 
   const handleCreate = (e) => {
     e.preventDefault();
     if (!form.nombre || !form.email) return;
-
-    const nuevoUsuario = {
-      id: Date.now(),
-      nombre: form.nombre,
-      email: form.email,
-      password: form.password,
-      rol: form.rol,
-      creadoPor: user.id
-    };
-
-    setUsuarios([...usuarios, nuevoUsuario]);
-    setForm({ nombre: '', email: '', password: '123', rol: 'agente' });
-    alert(`${form.rol.toUpperCase()} creado exitosamente.`);
+    setUsuarios([...usuarios, { id: Date.now(), ...form, password: '123', creadoPor: user.id }]);
+    setForm({ nombre: '', email: '', rol: 'agente' });
+    alert('Usuario creado con éxito');
   };
-
-  if (user.rol === 'agente') return null;
-
-  const subordinados = usuarios.filter(u => u.creadoPor === user.id);
 
   return (
     <div className="grid">
       <div className="card">
-        <div className="card-header"><span className="card-title">Dar de Alta Nuevo Usuario</span></div>
-        <form onSubmit={handleCreate}>
-          <div className="form-group">
-            <label className="form-label">Nombre Completo</label>
-            <input className="form-input" value={form.nombre} onChange={e => setForm({...form, nombre: e.target.value})} placeholder="Ej. Juan Pérez" />
-          </div>
-          <div className="form-group">
-            <label className="form-label">Correo Electrónico</label>
-            <input className="form-input" type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} placeholder="correo@travelpro.com" />
-          </div>
-          <div className="form-group">
-            <label className="form-label">Rol del Usuario</label>
-            <select className="form-input" value={form.rol} onChange={e => setForm({...form, rol: e.target.value})}>
-              {user.rol === 'gerente' && <option value="gerente">Gerente</option>}
-              {(user.rol === 'gerente' || user.rol === 'jefe') && <option value="jefe">Jefe de Equipo</option>}
-              <option value="agente">Agente de Viajes</option>
-            </select>
-          </div>
-          <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Crear Usuario</button>
-        </form>
-      </div>
-
-      <div className="card">
-        <div className="card-header"><span className="card-title">Personal a mi cargo</span></div>
-        {subordinados.length === 0 ? <p style={{ color: '#6b7280' }}>No has dado de alta a nadie aún.</p> : null}
-        {subordinados.map(s => (
-          <div key={s.id} className="list-item">
-            <div><strong>{s.nombre}</strong><br/><span style={{ fontSize: '13px', color: '#6b7280' }}>{s.email}</span></div>
-            <span style={{ background: '#e0e7ff', color: '#3730a3', padding: '4px 8px', borderRadius: '4px', fontSize: '12px', textTransform: 'uppercase', fontWeight: 'bold' }}>{s.rol}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function ClientManagementModule({ user, clientes, setClientes }) {
-  const [form, setForm] = useState({ nombre: '', email: '', telefono: '' });
-
-  const handleCreate = (e) => {
-    e.preventDefault();
-    if (!form.nombre) return;
-    const nuevo = { idCliente: Date.now(), ...form, idAgente: user.id };
-    setClientes([...clientes, nuevo]);
-    setForm({ nombre: '', email: '', telefono: '' });
-  };
-
-  const misClientes = clientes.filter(c => c.idAgente === user.id);
-
-  return (
-    <div className="grid">
-      <div className="card">
-        <div className="card-header"><span className="card-title">Registrar Nuevo Cliente</span></div>
+        <div className="card-header"><span className="card-title">Dar de Alta Usuario</span></div>
         <form onSubmit={handleCreate}>
           <div className="form-group">
             <label className="form-label">Nombre</label>
@@ -326,19 +173,22 @@ function ClientManagementModule({ user, clientes, setClientes }) {
             <input className="form-input" type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} />
           </div>
           <div className="form-group">
-            <label className="form-label">Teléfono</label>
-            <input className="form-input" value={form.telefono} onChange={e => setForm({...form, telefono: e.target.value})} />
+            <label className="form-label">Rol</label>
+            <select className="form-input" value={form.rol} onChange={e => setForm({...form, rol: e.target.value})}>
+              {user.rol === 'gerente' && <option value="gerente">Gerente</option>}
+              {(user.rol === 'gerente' || user.rol === 'jefe') && <option value="jefe">Jefe de Equipo</option>}
+              <option value="agente">Agente de Viajes</option>
+            </select>
           </div>
-          <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Guardar Cliente</button>
+          <button className="btn btn-primary" type="submit">Crear Usuario</button>
         </form>
       </div>
-
       <div className="card">
-        <div className="card-header"><span className="card-title">Mi Cartera de Clientes</span></div>
-        {misClientes.length === 0 ? <p style={{ color: '#6b7280' }}>Aún no tienes clientes.</p> : null}
-        {misClientes.map(c => (
-          <div key={c.idCliente} className="list-item">
-            <div><strong>{c.nombre}</strong><br/><span style={{ fontSize: '13px', color: '#6b7280' }}>{c.email}</span></div>
+        <div className="card-header"><span className="card-title">Subordinados</span></div>
+        {usuarios.filter(u => u.creadoPor === user.id).map(u => (
+          <div key={u.id} className="list-item">
+            <div><b>{u.nombre}</b><br/><small>{u.email}</small></div>
+            <span className="role-badge">{u.rol}</span>
           </div>
         ))}
       </div>
@@ -346,150 +196,236 @@ function ClientManagementModule({ user, clientes, setClientes }) {
   );
 }
 
-/* ============================================================
-   MÓDULOS DE COTIZACIÓN (Agente)
-   ============================================================ */
-function CotizacionFlow({ user, clientes, setClientes }) {
-  const [step, setStep] = useState(1);
-  const [selectedClient, setSelectedClient] = useState(null);
-  const [planData, setPlanData] = useState({ destino: '', noches: 1, paisFiltro: 'Todos' });
-  const [reservaVuelo, setReservaVuelo] = useState(null);
-  const [reservaHospedaje, setReservaHospedaje] = useState(null);
-
-  const misClientes = clientes.filter(c => c.idAgente === user.id);
-
-  const handleApartarVuelo = (vuelo) => {
-    const orderId = 'AMD-V' + Math.random().toString(36).substr(2, 6).toUpperCase();
-    setReservaVuelo({ ...vuelo, orderId });
-  };
-
-  const handleApartarHospedaje = (hotel) => {
-    const orderId = 'AMD-H' + Math.random().toString(36).substr(2, 6).toUpperCase();
-    setReservaHospedaje({ ...hotel, orderId });
+function AgentClientModule({ user, clientes, setClientes }) {
+  const [form, setForm] = useState({ nombre: '', email: '', telefono: '' });
+  const handleCreate = (e) => {
+    e.preventDefault();
+    setClientes([...clientes, { idCliente: Date.now(), ...form, idAgente: user.id }]);
+    setForm({ nombre: '', email: '', telefono: '' });
   };
 
   return (
-    <div>
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '24px' }}>
-        {[1, 2, 3].map(s => (
-          <div key={s} style={{ flex: 1, height: '6px', background: step >= s ? '#3b82f6' : '#e5e7eb', borderRadius: '10px' }}></div>
+    <div className="grid">
+      <div className="card">
+        <div className="card-header"><span className="card-title">Nuevo Cliente</span></div>
+        <form onSubmit={handleCreate}>
+          <div className="form-group"><label className="form-label">Nombre</label><input className="form-input" value={form.nombre} onChange={e => setForm({...form, nombre: e.target.value})} /></div>
+          <div className="form-group"><label className="form-label">Email</label><input className="form-input" value={form.email} onChange={e => setForm({...form, email: e.target.value})} /></div>
+          <div className="form-group"><label className="form-label">Teléfono</label><input className="form-input" value={form.telefono} onChange={e => setForm({...form, telefono: e.target.value})} /></div>
+          <button className="btn btn-primary" type="submit">Registrar Cliente</button>
+        </form>
+      </div>
+      <div className="card">
+        <div className="card-header"><span className="card-title">Mis Clientes</span></div>
+        {clientes.filter(c => c.idAgente === user.id).map(c => (
+          <div key={c.idCliente} className="list-item"><b>{c.nombre}</b><span>{c.email}</span></div>
         ))}
       </div>
+    </div>
+  );
+}
 
+/* ============================================================
+   4. FLUJO COMPLETO DE COTIZACIÓN (DFD)
+   ============================================================ */
+function QuoteWizardModule({ user, clientes }) {
+  const [step, setStep] = useState(1);
+  
+  // Estado global de la cotización
+  const [plan, setPlan] = useState({ idPlan: Date.now(), destino: '', pais: 'Francia', noches: 1, estado: 'borrador' });
+  const [reservaVuelo, setReservaVuelo] = useState(null);
+  const [reservaHospedaje, setReservaHospedaje] = useState(null);
+  const [transporte, setTransporte] = useState(null);
+  const [atracciones, setAtracciones] = useState([]);
+  const [viajeros, setViajeros] = useState([]);
+  const [gastosExtras, setGastosExtras] = useState([]);
+
+  const paises = ['Francia', 'España', 'Japón', 'Estados Unidos', 'México'];
+  const misClientes = clientes.filter(c => c.idAgente === user.id);
+
+  // Handlers Amadeus (Simulación)
+  const apartarVuelo = (v) => setReservaVuelo({ ...v, orderId: `AMD-V-${Math.random().toString(36).substr(2,5).toUpperCase()}`, expiracion: '2 días', estado: 'apartado' });
+  const apartarHospedaje = (h) => setReservaHospedaje({ ...h, orderId: `AMD-H-${Math.random().toString(36).substr(2,5).toUpperCase()}`, expiracion: '2 días', estado: 'apartado' });
+
+  // Cálculos
+  const numPax = viajeros.length || 1;
+  const totalVuelos = reservaVuelo ? reservaVuelo.precioMXN * numPax : 0;
+  const totalHotel = reservaHospedaje ? reservaHospedaje.precioMXN : 0;
+  const totalTransporte = transporte ? transporte.precioMXN * numPax : 0;
+  const totalAtracciones = atracciones.reduce((sum, a) => sum + a.precioMXN, 0) * numPax;
+  
+  const costoCompartido = totalVuelos + totalHotel + totalTransporte + totalAtracciones;
+  const costoPorPersona = costoCompartido / numPax;
+  
+  const totalExtras = gastosExtras.reduce((sum, g) => sum + g.costoMXN, 0);
+  const subtotal = costoCompartido + totalExtras;
+  const comision = subtotal * 0.10; // 10% comisión
+  const totalFinal = subtotal + comision;
+
+  return (
+    <div>
+      {/* BARRA DE PROGRESO */}
+      <div className="stepper">
+        {[1, 2, 3, 4, 5].map(s => <div key={s} className={`step ${step >= s ? 'active' : ''}`}></div>)}
+      </div>
+
+      {/* PASO 1: REGISTRAR SOLICITUD */}
       {step === 1 && (
         <div className="card">
-          <div className="card-header"><span className="card-title">Paso 1: Seleccionar Cliente y Destino</span></div>
-          <div className="form-group">
-            <label className="form-label">Cliente</label>
-            <select className="form-input" onChange={e => setSelectedClient(misClientes.find(c => c.idCliente === Number(e.target.value)))}>
-              <option value="">Selecciona un cliente...</option>
-              {misClientes.map(c => <option key={c.idCliente} value={c.idCliente}>{c.nombre}</option>)}
-            </select>
-          </div>
+          <div className="card-header"><span className="card-title">Paso 1: Registrar Solicitud (Plan de Viaje)</span></div>
           <div className="form-row">
             <div className="form-group">
-              <label className="form-label">País de Destino</label>
-              <select className="form-input" onChange={e => setPlanData({...planData, paisFiltro: e.target.value})}>
-                {PAISES.map(p => <option key={p} value={p}>{p}</option>)}
+              <label className="form-label">Cliente</label>
+              <select className="form-input" onChange={e => setPlan({...plan, cliente: misClientes.find(c => c.idCliente === Number(e.target.value))})}>
+                <option value="">Selecciona...</option>
+                {misClientes.map(c => <option key={c.idCliente} value={c.idCliente}>{c.nombre}</option>)}
               </select>
             </div>
             <div className="form-group">
-              <label className="form-label">Ciudad / Destino</label>
-              <input className="form-input" placeholder="Ej. París" onChange={e => setPlanData({...planData, destino: e.target.value})} />
+              <label className="form-label">País Destino</label>
+              <select className="form-input" onChange={e => setPlan({...plan, pais: e.target.value})}>
+                {paises.map(p => <option key={p} value={p}>{p}</option>)}
+              </select>
             </div>
           </div>
-          <button className="btn btn-primary" onClick={() => setStep(2)} disabled={!selectedClient || !planData.destino}>Continuar a Vuelos</button>
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">Ciudad (Destino)</label>
+              <input className="form-input" placeholder="Ej. París" onChange={e => setPlan({...plan, destino: e.target.value})} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Noches</label>
+              <input className="form-input" type="number" min="1" defaultValue="1" onChange={e => setPlan({...plan, noches: e.target.value})} />
+            </div>
+          </div>
+          <button className="btn btn-primary" onClick={() => setStep(2)} disabled={!plan.cliente || !plan.destino}>Siguiente: Vuelos y Hoteles</button>
         </div>
       )}
 
+      {/* PASO 2: VUELOS Y HOSPEDAJE (AMADEUS) */}
       {step === 2 && (
         <div>
           <button className="btn btn-secondary btn-sm" onClick={() => setStep(1)} style={{ marginBottom: '16px' }}>← Volver</button>
           <div className="card">
-            <div className="card-header">
-              <span className="card-title">Paso 2: Vuelos a {planData.paisFiltro}</span>
-            </div>
+            <div className="card-header"><span className="card-title">Vuelos a {plan.pais} (Amadeus)</span></div>
             <div className="grid">
-              {AMADEUS_VUELOS.filter(v => planData.paisFiltro === 'Todos' || v.pais === planData.paisFiltro).map(v => {
-                const isSelected = reservaVuelo?.idVuelo === v.idVuelo;
-                return (
-                  <div key={v.idVuelo} className={`card ${isSelected ? 'selected-border' : ''}`} style={{ marginBottom: 0 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                      <strong>{v.aerolinea} <span style={{fontSize:'12px', color:'#6b7280'}}>({v.pais})</span></strong>
-                      <span className="price-tag">${v.precioMXN.toLocaleString()}</span>
-                    </div>
-                    <div style={{ fontSize: '13px', color: '#6b7280', marginBottom: '16px' }}>
-                      ⏱ {v.duracion} · Escalas: {v.escalas}
-                    </div>
-                    {isSelected ? (
-                      <div style={{ background: '#ecfdf5', color: '#065f46', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
-                        ✓ Apartado en Amadeus<br/>Order ID: <b>{reservaVuelo.orderId}</b>
-                      </div>
-                    ) : (
-                      <button className="btn btn-primary btn-sm" style={{ width: '100%' }} onClick={() => handleApartarVuelo(v)}>Apartar Vuelo</button>
-                    )}
-                  </div>
-                );
-              })}
+              {AMADEUS_VUELOS.filter(v => v.pais === plan.pais).map(v => (
+                <div key={v.idVuelo} className={`card ${reservaVuelo?.idVuelo === v.idVuelo ? 'highlight' : ''}`}>
+                  <b>{v.aerolinea}</b> <span className="price-tag">${v.precioMXN}</span>
+                  {reservaVuelo?.idVuelo === v.idVuelo ? (
+                    <div style={{ marginTop: '10px', fontSize: '12px', color: '#065f46' }}>✓ Order ID: {reservaVuelo.orderId}</div>
+                  ) : (
+                    <button className="btn btn-primary btn-sm" style={{ width: '100%', marginTop: '10px' }} onClick={() => apartarVuelo(v)}>Apartar</button>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
-
           <div className="card">
-            <div className="card-header"><span className="card-title">Paso 3: Hospedajes en {planData.paisFiltro}</span></div>
+            <div className="card-header"><span className="card-title">Hospedajes en {plan.pais} (Amadeus)</span></div>
             <div className="grid">
-              {AMADEUS_HOSPEDAJES.filter(h => planData.paisFiltro === 'Todos' || h.pais === planData.paisFiltro).map(h => {
-                const isSelected = reservaHospedaje?.idHotel === h.idHotel;
-                return (
-                  <div key={h.idHotel} className={`card ${isSelected ? 'selected-border' : ''}`} style={{ marginBottom: 0 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                      <strong>{h.nombre} <span style={{fontSize:'12px', color:'#6b7280'}}>({h.pais})</span></strong>
-                      <span className="price-tag">${h.precioMXN.toLocaleString()}</span>
-                    </div>
-                    <div style={{ fontSize: '13px', color: '#6b7280', marginBottom: '16px' }}>
-                      🛏 {h.camas} camas
-                    </div>
-                    {isSelected ? (
-                      <div style={{ background: '#ecfdf5', color: '#065f46', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
-                        ✓ Apartado en Amadeus<br/>Order ID: <b>{reservaHospedaje.orderId}</b>
-                      </div>
-                    ) : (
-                      <button className="btn btn-primary btn-sm" style={{ width: '100%' }} onClick={() => handleApartarHospedaje(h)}>Apartar Hospedaje</button>
-                    )}
-                  </div>
-                );
-              })}
+              {AMADEUS_HOSPEDAJES.filter(h => h.pais === plan.pais).map(h => (
+                <div key={h.idHotel} className={`card ${reservaHospedaje?.idHotel === h.idHotel ? 'highlight' : ''}`}>
+                  <b>{h.nombre}</b> <span className="price-tag">${h.precioMXN}</span>
+                  {reservaHospedaje?.idHotel === h.idHotel ? (
+                    <div style={{ marginTop: '10px', fontSize: '12px', color: '#065f46' }}>✓ Order ID: {reservaHospedaje.orderId}</div>
+                  ) : (
+                    <button className="btn btn-primary btn-sm" style={{ width: '100%', marginTop: '10px' }} onClick={() => apartarHospedaje(h)}>Apartar</button>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
-
-          <div style={{ textAlign: 'right' }}>
-            <button className="btn btn-primary" onClick={() => setStep(3)} disabled={!reservaVuelo || !reservaHospedaje}>Continuar a Presupuesto →</button>
-          </div>
+          <button className="btn btn-primary" onClick={() => setStep(3)} disabled={!reservaVuelo || !reservaHospedaje}>Siguiente: Atracciones</button>
         </div>
       )}
 
+      {/* PASO 3: TRANSPORTE Y ATRACCIONES */}
       {step === 3 && (
         <div>
           <button className="btn btn-secondary btn-sm" onClick={() => setStep(2)} style={{ marginBottom: '16px' }}>← Volver</button>
+          <div className="grid">
+            <div className="card">
+              <div className="card-header"><span className="card-title">Transporte Local</span></div>
+              {TRANSPORTE_DB.map(t => (
+                <div key={t.idTransporte} className="list-item">
+                  <div>{t.tipo} - <b>${t.precioMXN}</b></div>
+                  <button className="btn btn-secondary btn-sm" onClick={() => setTransporte(t)}>{transporte?.idTransporte === t.idTransporte ? '✓' : 'Elegir'}</button>
+                </div>
+              ))}
+            </div>
+            <div className="card">
+              <div className="card-header"><span className="card-title">Atracciones en {plan.pais}</span></div>
+              {ATRACCIONES_DB.filter(a => a.pais === plan.pais).map(a => (
+                <div key={a.idAtraccion} className="list-item">
+                  <div>{a.nombre} - <b>${a.precioMXN}</b></div>
+                  <button className="btn btn-secondary btn-sm" onClick={() => {
+                    if(!atracciones.find(x => x.idAtraccion === a.idAtraccion)) setAtracciones([...atracciones, a]);
+                  }}>Añadir</button>
+                </div>
+              ))}
+            </div>
+          </div>
+          <button className="btn btn-primary" onClick={() => setStep(4)} disabled={!transporte}>Siguiente: Viajeros y Extras</button>
+        </div>
+      )}
+
+      {/* PASO 4: VIAJEROS Y GASTOS EXTRAS */}
+      {step === 4 && (
+        <div>
+          <button className="btn btn-secondary btn-sm" onClick={() => setStep(3)} style={{ marginBottom: '16px' }}>← Volver</button>
+          <div className="grid">
+            <div className="card">
+              <div className="card-header"><span className="card-title">Registrar Viajeros</span></div>
+              <button className="btn btn-primary btn-sm" onClick={() => setViajeros([...viajeros, { idViajero: Date.now(), nombre: `Viajero ${viajeros.length + 1}` }])}>+ Añadir Viajero</button>
+              <div style={{ marginTop: '16px' }}>
+                {viajeros.map(v => (
+                  <div key={v.idViajero} style={{ background: '#f3f4f6', padding: '12px', borderRadius: '8px', marginBottom: '10px' }}>
+                    <b>{v.nombre}</b>
+                    <div style={{ marginTop: '8px', display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+                      {GASTOS_DB.map((g, i) => (
+                        <button key={i} className="btn btn-secondary btn-sm" onClick={() => setGastosExtras([...gastosExtras, { idGasto: Date.now(), idViajero: v.idViajero, ...g }])}>+ {g.tipo}</button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="card">
+              <div className="card-header"><span className="card-title">Gastos Extras Registrados</span></div>
+              {gastosExtras.map(g => (
+                <div key={g.idGasto} className="list-item"><span>{g.tipo} - {g.descripcion}</span><b>${g.costoMXN}</b></div>
+              ))}
+            </div>
+          </div>
+          <button className="btn btn-primary" onClick={() => setStep(5)} disabled={viajeros.length === 0}>Siguiente: Cotización Final</button>
+        </div>
+      )}
+
+      {/* PASO 5: COTIZACIÓN Y CONFIRMACIÓN (Paso 4 del DFD) */}
+      {step === 5 && (
+        <div>
           <div className="card">
             <div className="card-header"><span className="card-title">Resumen de Cotización</span></div>
-            <div className="list-item">
-              <span>Vuelo {reservaVuelo.aerolinea} (1 pax)</span>
-              <strong>${reservaVuelo.precioMXN.toLocaleString()}</strong>
-            </div>
-            <div className="list-item">
-              <span>Hospedaje {reservaHospedaje.nombre}</span>
-              <strong>${reservaHospedaje.precioMXN.toLocaleString()}</strong>
-            </div>
+            <div className="list-item"><span>Vuelos ({numPax} pax)</span><b>${totalVuelos.toLocaleString()}</b></div>
+            <div className="list-item"><span>Hospedaje</span><b>${totalHotel.toLocaleString()}</b></div>
+            <div className="list-item"><span>Transporte</span><b>${totalTransporte.toLocaleString()}</b></div>
+            <div className="list-item"><span>Atracciones</span><b>${totalAtracciones.toLocaleString()}</b></div>
+            <div className="list-item"><span>Gastos Extras</span><b>${totalExtras.toLocaleString()}</b></div>
             
-            <div style={{ marginTop: '24px', padding: '24px', background: '#1e3a8a', color: 'white', borderRadius: '16px' }}>
-              <div style={{ fontSize: '14px', opacity: 0.8 }}>TOTAL COTIZADO</div>
-              <div style={{ fontSize: '32px', fontWeight: '800' }}>${(reservaVuelo.precioMXN + reservaHospedaje.precioMXN).toLocaleString()} MXN</div>
-              <div style={{ fontSize: '12px', marginTop: '8px', opacity: 0.8 }}>Cliente: {selectedClient.nombre} | Destino: {planData.destino} ({planData.paisFiltro})</div>
+            <div style={{ background: '#1e3a8a', color: 'white', padding: '24px', borderRadius: '12px', marginTop: '20px' }}>
+              <div style={{ fontSize: '14px', opacity: 0.8 }}>Subtotal + Comisión (10%)</div>
+              <div style={{ fontSize: '32px', fontWeight: '800' }}>${totalFinal.toLocaleString()} MXN</div>
             </div>
-            
-            <button className="btn btn-primary" onClick={() => window.print()} style={{ width: '100%', marginTop: '16px' }}>
-              🖨️ Imprimir Cotización
-            </button>
+          </div>
+
+          <div className="card">
+            <div className="card-header"><span className="card-title">Confirmar Reserva (Amadeus)</span></div>
+            <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '16px' }}>El cliente debe aceptar. Si acepta, se confirman los Order IDs. Si rechaza, se liberan.</p>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button className="btn btn-success" onClick={() => { alert('Reserva Confirmada en Amadeus. PDF Generado.'); setStep(1); }}>Aceptar y Confirmar</button>
+              <button className="btn btn-danger" onClick={() => { alert('Reserva Cancelada y liberada en Amadeus.'); setStep(1); }}>Rechazar y Liberar</button>
+            </div>
           </div>
         </div>
       )}
@@ -498,75 +434,53 @@ function CotizacionFlow({ user, clientes, setClientes }) {
 }
 
 /* ============================================================
-   APP PRINCIPAL
+   5. APP PRINCIPAL
    ============================================================ */
 function App() {
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('dashboard');
-  
   const [usuarios, setUsuarios] = useState(INITIAL_USUARIOS);
-  const [clientes, setClientes] = useState(INITIAL_CLIENTES);
+  const [clientes, setClientes] = useState([{ idCliente: 1, nombre: 'Juan Perez', email: 'j@e.com', idAgente: 3 }]);
 
   if (!user) return <LoginScreen onLogin={setUser} usuarios={usuarios} />;
-
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'dashboard': return <DashboardModule user={user} usuarios={usuarios} clientes={clientes} />;
-      case 'usuarios': return <UserManagementModule user={user} usuarios={usuarios} setUsuarios={setUsuarios} />;
-      case 'clientes': return <ClientManagementModule user={user} clientes={clientes} setClientes={setClientes} />;
-      case 'cotizacion': return <CotizacionFlow user={user} clientes={clientes} setClientes={setClientes} />;
-      default: return <DashboardModule user={user} usuarios={usuarios} clientes={clientes} />;
-    }
-  };
 
   return (
     <>
       <style>{globalCSS}</style>
       <div className="app-container">
-        {/* SIDEBAR */}
         <aside className="sidebar">
-          <div className="sidebar-logo">
-            ✈️ TravelPro
-          </div>
+          <div className="sidebar-logo">✈️ TravelPro</div>
           <div className="sidebar-menu">
-            <button className={`menu-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>
-              📊 Dashboard
-            </button>
-            
+            <button className={`menu-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>📊 Dashboard</button>
             {(user.rol === 'gerente' || user.rol === 'jefe') && (
-              <button className={`menu-item ${activeTab === 'usuarios' ? 'active' : ''}`} onClick={() => setActiveTab('usuarios')}>
-                👥 Dar de Alta Personal
-              </button>
+              <button className={`menu-item ${activeTab === 'personal' ? 'active' : ''}`} onClick={() => setActiveTab('personal')}>👥 Personal</button>
             )}
-
             {user.rol === 'agente' && (
               <>
-                <button className={`menu-item ${activeTab === 'clientes' ? 'active' : ''}`} onClick={() => setActiveTab('clientes')}>
-                  🙋‍♂️ Mis Clientes
-                </button>
-                <button className={`menu-item ${activeTab === 'cotizacion' ? 'active' : ''}`} onClick={() => setActiveTab('cotizacion')}>
-                  💼 Nueva Cotización
-                </button>
+                <button className={`menu-item ${activeTab === 'clientes' ? 'active' : ''}`} onClick={() => setActiveTab('clientes')}>🙋 Clientes</button>
+                <button className={`menu-item ${activeTab === 'cotizar' ? 'active' : ''}`} onClick={() => setActiveTab('cotizar')}>💼 Cotizar Viaje</button>
               </>
             )}
           </div>
         </aside>
 
-        {/* MAIN CONTENT */}
         <main className="main-content">
           <header className="topbar">
-            <h1>Panel de Control</h1>
-            <div className="user-profile">
+            <h1 style={{ fontSize: '18px', fontWeight: '600' }}>
+              {activeTab === 'dashboard' ? 'Panel de Control' : activeTab === 'personal' ? 'Gestión de Personal' : activeTab === 'clientes' ? 'Cartera de Clientes' : 'Nueva Cotización'}
+            </h1>
+            <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
               <span className="role-badge">{user.rol}</span>
-              <span style={{ fontWeight: '600', fontSize: '14px' }}>{user.nombre}</span>
-              <button className="btn-logout" onClick={() => { setUser(null); setActiveTab('dashboard'); }}>
-                Salir
-              </button>
+              <b>{user.nombre}</b>
+              <button className="btn-logout" onClick={() => setUser(null)}>Salir</button>
             </div>
           </header>
 
           <div className="content-area">
-            {renderContent()}
+            {activeTab === 'dashboard' && <div className="card"><h2>Bienvenido, {user.nombre}</h2><p>Selecciona una opción del menú lateral para comenzar.</p></div>}
+            {activeTab === 'personal' && <AdminUsersModule user={user} usuarios={usuarios} setUsuarios={setUsuarios} />}
+            {activeTab === 'clientes' && <AgentClientModule user={user} clientes={clientes} setClientes={setClientes} />}
+            {activeTab === 'cotizar' && <QuoteWizardModule user={user} clientes={clientes} />}
           </div>
         </main>
       </div>
@@ -574,8 +488,5 @@ function App() {
   );
 }
 
-/* ============================================================
-   RENDER
-   ============================================================ */
 const root = createRoot(document.getElementById('root'));
 root.render(<App />);
