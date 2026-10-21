@@ -71,6 +71,7 @@ const sumarDias = (iso, d) => {
 };
 const fechaLarga = (iso) =>
   new Date(iso + 'T12:00:00').toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' });
+const fechaCorta = (iso) => new Date(iso + 'T12:00:00').toLocaleDateString('es-MX', { day: '2-digit', month: 'short' });
 const nuevoOrderId = (p) => `AMD-${p}-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
 const folioCot = (n) => `COT-${String(n).padStart(8, '0')}`;
 
@@ -103,18 +104,19 @@ function calcular({ pax, vuelo, hotel, noches, transportes, atracciones, viajero
 
 /* ============================================================
    3. ESTILOS
-   Paleta: tinta #0F1B2D · papel #EEF1F4 · señal (teal) #0E7C86
-           ámbar #D98A1F (expiraciones y avisos) · rojo #B42318
+   Paleta: índigo #1E1B4B · lavanda #F4F1FF · violeta #5B3DF5
+           coral #FF5A6E · sol #FFB81C · menta #0EA67F
    Tipografía: Bricolage Grotesque (títulos) + Figtree (texto)
    ============================================================ */
 const globalCSS = `
   @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Figtree:wght@400;500;600;700&display=swap');
   :root {
-    --ink: #0F1B2D; --ink-2: #44546A; --ink-3: #7B8798;
-    --paper: #EEF1F4; --card: #FFFFFF; --line: #DDE2E9;
-    --signal: #0E7C86; --signal-d: #0A5F67; --signal-bg: #E3F3F4;
-    --amber: #D98A1F; --amber-bg: #FDF1DC;
-    --red: #B42318; --red-bg: #FDE8E6; --ok: #1E7B4A; --ok-bg: #E2F4EA;
+    --ink: #1E1B4B; --ink-2: #4B4A7A; --ink-3: #8583AD;
+    --paper: #F4F1FF; --card: #FFFFFF; --line: #E2DDF7;
+    --signal: #5B3DF5; --signal-d: #4527D6; --signal-bg: #ECE8FF;
+    --coral: #FF5A6E; --sun: #FFB81C; --mint: #0EA67F;
+    --amber: #FFB81C; --amber-bg: #FFF1C7;
+    --red: #E5384F; --red-bg: #FFE3E7; --ok: #0B8F6C; --ok-bg: #D5F6EA;
     --r-lg: 14px; --r-md: 10px; --r-sm: 6px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -125,14 +127,14 @@ const globalCSS = `
 
   /* ---------- Estructura de la app ---------- */
   .app { display: flex; height: 100vh; overflow: hidden; }
-  .sidebar { width: 248px; background: var(--ink); color: #fff; display: flex; flex-direction: column; flex-shrink: 0; }
+  .sidebar { width: 248px; background: linear-gradient(180deg, #2B1FA8 0%, #5B3DF5 100%); color: #fff; display: flex; flex-direction: column; flex-shrink: 0; }
   .brand { padding: 26px 24px 22px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 22px; }
-  .brand small { display: block; font-family: 'Figtree', sans-serif; font-weight: 500; font-size: 12px; color: #9FB0C6; margin-top: 2px; }
+  .brand small { display: block; font-family: 'Figtree', sans-serif; font-weight: 500; font-size: 12px; color: #D9D3FF; margin-top: 2px; }
   .nav { padding: 8px 12px; flex: 1; }
-  .nav button { display: flex; width: 100%; align-items: center; gap: 12px; padding: 11px 14px; margin-bottom: 4px; border: 0; border-radius: var(--r-md); background: transparent; color: #C5D0DF; font-weight: 600; cursor: pointer; text-align: left; }
+  .nav button { display: flex; width: 100%; align-items: center; gap: 12px; padding: 11px 14px; margin-bottom: 4px; border: 0; border-radius: var(--r-md); background: transparent; color: #E6E0FF; font-weight: 600; cursor: pointer; text-align: left; }
   .nav button:hover { background: rgba(255,255,255,.07); color: #fff; }
-  .nav button.on { background: var(--signal); color: #fff; }
-  .side-user { padding: 18px 24px; border-top: 1px solid rgba(255,255,255,.1); font-size: 13px; color: #9FB0C6; }
+  .nav button.on { background: var(--sun); color: var(--ink); }
+  .side-user { padding: 18px 24px; border-top: 1px solid rgba(255,255,255,.18); font-size: 13px; color: #D9D3FF; }
   .side-user b { display: block; color: #fff; font-size: 14px; }
   .btn-exit { margin-top: 10px; background: transparent; color: #F4B7B0; border: 1px solid rgba(244,183,176,.35); padding: 6px 12px; border-radius: var(--r-sm); cursor: pointer; font-weight: 600; }
   .btn-exit:hover { background: rgba(244,183,176,.12); }
@@ -153,7 +155,7 @@ const globalCSS = `
   .row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
   .field { margin-bottom: 16px; }
   .field label { display: block; font-weight: 600; font-size: 13px; color: var(--ink-2); margin-bottom: 6px; }
-  .input { width: 100%; padding: 11px 12px; border: 1px solid #C9D1DB; border-radius: var(--r-md); background: #fff; }
+  .input { width: 100%; padding: 11px 12px; border: 1px solid #CDC6F0; border-radius: var(--r-md); background: #fff; }
   .input:focus { border-color: var(--signal); outline: none; box-shadow: 0 0 0 3px rgba(14,124,134,.15); }
   .hint { font-size: 12.5px; color: var(--ink-3); margin-top: 5px; }
 
@@ -161,7 +163,7 @@ const globalCSS = `
   .btn:disabled { opacity: .5; cursor: not-allowed; }
   .btn-primary { background: var(--signal); color: #fff; }
   .btn-primary:hover:not(:disabled) { background: var(--signal-d); }
-  .btn-ghost { background: transparent; color: var(--ink-2); border: 1px solid #C9D1DB; }
+  .btn-ghost { background: transparent; color: var(--ink-2); border: 1px solid #CDC6F0; }
   .btn-ghost:hover { background: #fff; }
   .btn-ok { background: var(--ok); color: #fff; }
   .btn-danger { background: var(--red); color: #fff; }
@@ -172,11 +174,11 @@ const globalCSS = `
   .pill.amber { background: var(--amber-bg); color: #8A5300; }
   .pill.ok { background: var(--ok-bg); color: var(--ok); }
   .pill.red { background: var(--red-bg); color: var(--red); }
-  .pill.gray { background: #E8ECF1; color: var(--ink-2); }
+  .pill.gray { background: #ECE9FA; color: var(--ink-2); }
 
   .list-item { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--line); }
   .list-item:last-child { border-bottom: 0; }
-  .empty { padding: 22px; text-align: center; color: var(--ink-3); border: 1px dashed #C9D1DB; border-radius: var(--r-md); }
+  .empty { padding: 22px; text-align: center; color: var(--ink-3); border: 1px dashed #CDC6F0; border-radius: var(--r-md); }
   .alert { padding: 11px 14px; border-radius: var(--r-md); font-size: 13.5px; margin-bottom: 14px; }
   .alert.warn { background: var(--amber-bg); color: #7A4A00; }
   .alert.err { background: var(--red-bg); color: var(--red); }
@@ -200,7 +202,7 @@ const globalCSS = `
   .rail-step { position: relative; padding: 0 0 18px 34px; color: var(--ink-3); }
   .rail-step::before { content: ''; position: absolute; left: 11px; top: 24px; bottom: 0; width: 2px; background: var(--line); }
   .rail-step:last-child::before { display: none; }
-  .rail-dot { position: absolute; left: 0; top: 0; width: 24px; height: 24px; border-radius: 50%; background: #fff; border: 2px solid #C9D1DB; display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+  .rail-dot { position: absolute; left: 0; top: 0; width: 24px; height: 24px; border-radius: 50%; background: #fff; border: 2px solid #CDC6F0; display: grid; place-items: center; font-size: 12px; font-weight: 700; }
   .rail-step.now { color: var(--ink); }
   .rail-step.now .rail-dot { background: var(--signal); border-color: var(--signal); color: #fff; }
   .rail-step.done { color: var(--ink-2); }
@@ -219,13 +221,13 @@ const globalCSS = `
   .live-total b { font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; }
 
   /* ---------- Itinerario ---------- */
-  .day { border: 1px solid var(--line); border-radius: var(--r-md); padding: 14px; margin-bottom: 12px; background: #FAFBFC; }
+  .day { border: 1px solid var(--line); border-radius: var(--r-md); padding: 14px; margin-bottom: 12px; background: #FAF8FF; }
   .day-head { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 8px; }
   .act { display: flex; gap: 12px; align-items: center; padding: 6px 0; font-size: 14px; }
   .act time { font-weight: 700; min-width: 52px; color: var(--signal-d); }
   .act-form { display: grid; grid-template-columns: 110px 1fr auto; gap: 8px; margin-top: 8px; }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-  .chip { border: 1px solid #C9D1DB; background: #fff; border-radius: 999px; padding: 3px 10px; font-size: 12px; cursor: pointer; }
+  .chip { border: 1px solid #CDC6F0; background: #fff; border-radius: 999px; padding: 3px 10px; font-size: 12px; cursor: pointer; }
   .chip:hover { border-color: var(--signal); color: var(--signal-d); }
   .x { border: 0; background: transparent; color: var(--ink-3); cursor: pointer; font-size: 16px; margin-left: auto; }
   .x:hover { color: var(--red); }
@@ -233,7 +235,7 @@ const globalCSS = `
   /* ---------- Cotización: boarding pass ---------- */
   .ticket { display: grid; grid-template-columns: minmax(0, 1fr) 220px; background: #fff; border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; margin-bottom: 20px; }
   .ticket-main { padding: 28px 30px; }
-  .ticket-stub { background: var(--ink); color: #fff; padding: 28px 22px; border-left: 2px dashed #8CA0B8; position: relative; display: flex; flex-direction: column; justify-content: space-between; gap: 18px; }
+  .ticket-stub { background: linear-gradient(160deg, #4527D6 0%, #8A3DF5 55%, #FF5A6E 125%); color: #fff; padding: 28px 22px; border-left: 2px dashed #8CA0B8; position: relative; display: flex; flex-direction: column; justify-content: space-between; gap: 18px; }
   .ticket-stub::before, .ticket-stub::after { content: ''; position: absolute; left: -11px; width: 20px; height: 20px; border-radius: 50%; background: var(--paper); }
   .ticket-stub::before { top: -10px; } .ticket-stub::after { bottom: -10px; }
   .route { display: flex; align-items: center; gap: 14px; font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 800; line-height: 1.1; }
@@ -242,7 +244,7 @@ const globalCSS = `
   .t-label { font-size: 12px; color: var(--ink-3); font-weight: 600; }
   .t-val { font-weight: 700; }
   .stub-total { font-family: 'Bricolage Grotesque', sans-serif; font-size: 30px; font-weight: 800; line-height: 1.1; }
-  .stub small { color: #9FB0C6; display: block; }
+  .stub small { color: #EDE9FF; display: block; }
 
   .tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
   .tbl th { text-align: left; font-size: 12.5px; color: var(--ink-3); font-weight: 600; padding: 8px 6px; border-bottom: 1px solid var(--line); }
@@ -250,15 +252,33 @@ const globalCSS = `
   .tbl td.r, .tbl th.r { text-align: right; }
 
   .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; margin-bottom: 20px; }
-  .stat { background: #fff; border: 1px solid var(--line); border-radius: var(--r-lg); padding: 18px 20px; }
+  .stat { background: #fff; border: 1px solid var(--line); border-top: 5px solid var(--signal); border-radius: var(--r-lg); padding: 18px 20px; }
+  .stat:nth-child(2) { border-top-color: var(--sun); } .stat:nth-child(3) { border-top-color: var(--mint); } .stat:nth-child(4) { border-top-color: var(--coral); }
   .stat b { display: block; font-family: 'Bricolage Grotesque', sans-serif; font-size: 30px; }
   .stat span { color: var(--ink-2); font-size: 13.5px; }
 
+  .alert.ok { background: var(--ok-bg); color: var(--ok); }
+  .it-row { display: grid; grid-template-columns: minmax(0, 1fr) 170px 110px; gap: 10px; align-items: start; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .it-row:last-child { border-bottom: 0; }
+  .itin { margin-top: 20px; }
+  .itin-row { display: flex; gap: 14px; font-size: 14px; padding: 4px 0; }
+  .itin-row b { min-width: 104px; color: var(--signal-d); }
+
+  /* ---------- Pago ---------- */
+  .pay-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+  .pay-tab { padding: 12px 10px; border: 1.5px solid var(--line); border-radius: var(--r-md); background: #fff; font-weight: 700; cursor: pointer; text-align: center; }
+  .pay-tab small { display: block; font-weight: 500; color: var(--ink-3); }
+  .pay-tab.on { border-color: var(--signal); background: var(--signal-bg); color: var(--signal-d); }
+  .paybox { max-width: 480px; }
+  .ficha { background: var(--signal-bg); border-radius: var(--r-md); padding: 14px 16px; margin-bottom: 14px; }
+  .ficha div { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; font-size: 14px; }
+  .ficha b { text-align: right; }
+
   /* ---------- Login ---------- */
   .login { min-height: 100vh; display: grid; grid-template-columns: 1.1fr 1fr; }
-  .login-art { background: var(--ink); color: #fff; padding: 56px; display: flex; flex-direction: column; justify-content: space-between; }
+  .login-art { background: linear-gradient(150deg, #2B1FA8 0%, #5B3DF5 55%, #FF5A6E 135%); color: #fff; padding: 56px; display: flex; flex-direction: column; justify-content: space-between; }
   .login-art h1 { font-size: 46px; line-height: 1.05; font-weight: 800; max-width: 460px; }
-  .login-art p { color: #9FB0C6; max-width: 420px; }
+  .login-art p { color: #EDE9FF; max-width: 420px; }
   .login-form { display: grid; place-items: center; padding: 32px; }
   .login-card { width: 100%; max-width: 380px; }
   .quick { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
@@ -268,7 +288,7 @@ const globalCSS = `
     .app { flex-direction: column; height: auto; overflow: visible; }
     .sidebar { width: 100%; } .main { overflow: visible; }
     .wizard { grid-template-columns: 1fr; } .rail { position: static; }
-    .row, .row-3 { grid-template-columns: 1fr; }
+    .row, .row-3, .it-row { grid-template-columns: 1fr; }
     .ticket { grid-template-columns: 1fr; } .ticket-stub { border-left: 0; border-top: 2px dashed #8CA0B8; }
     .login { grid-template-columns: 1fr; } .login-art { display: none; }
     .content, .topbar { padding-left: 18px; padding-right: 18px; }
@@ -317,6 +337,14 @@ function QuoteTicket({ cot }) {
             <tr><td>Comisión de la agencia (10%)</td><td className="r num">{fmt(cot.calc.comision)}</td></tr>
           </tbody>
         </table>
+        {cot.itinerario.length > 0 && (
+          <div className="itin">
+            <div className="t-label" style={{ marginBottom: 6 }}>Itinerario de actividades</div>
+            {[...cot.itinerario].sort((a, b) => a.dia - b.dia || a.hora.localeCompare(b.hora)).map((x) => (
+              <div key={x.idAtraccion} className="itin-row"><b>Día {x.dia} · {x.hora}</b><span>{x.nombre}{x.notas ? ` — ${x.notas}` : ''}</span></div>
+            ))}
+          </div>
+        )}
       </div>
       <div className="ticket-stub">
         <div><small>Folio</small><b>{cot.folio}</b></div>
@@ -349,10 +377,10 @@ function LoginScreen({ onLogin, usuarios }) {
         <div className="login-art">
           <div className="display" style={{ fontSize: 24, fontWeight: 800 }}>TravelPro</div>
           <div>
-            <h1>De la solicitud al presupuesto, en cuatro pasos.</h1>
-            <p style={{ marginTop: 16 }}>Apartas vuelos y hospedaje en Amadeus, armas el itinerario y envías la cotización al cliente.</p>
+            <h1>Cada viaje merece una cotización clara.</h1>
+            <p style={{ marginTop: 16 }}>Reserva vuelos y hoteles, arma el plan de actividades y comparte con tu cliente un presupuesto listo para aprobar.</p>
           </div>
-          <p style={{ fontSize: 13 }}>Ingeniería de Software · Equipo 9</p>
+          <span />
         </div>
         <div className="login-form">
           <form className="login-card" onSubmit={submit}>
@@ -472,6 +500,178 @@ function AgentClientModule({ user, clientes, setClientes }) {
 /* ============================================================
    6. FLUJO DE COTIZACIÓN (los 4 procesos del DFD Nivel 1)
    ============================================================ */
+/* ------------------------------------------------------------
+   Paso 4.4 · Confirmar o liberar (se usa en el asistente y en "Cotizaciones")
+   El pago es una simulación: no se guarda el número de tarjeta, solo los últimos 4 dígitos.
+   ------------------------------------------------------------ */
+const METODOS = [['Tarjeta', 'Débito o crédito'], ['Transferencia', 'SPEI'], ['Efectivo', 'En oficina']];
+
+function PanelRespuesta({ cot, onUpdate, onNew }) {
+  const [pagando, setPagando] = useState(false);
+  const [metodo, setMetodo] = useState('Tarjeta');
+  const [tarjeta, setTarjeta] = useState({ numero: '', titular: '', vence: '', cvv: '' });
+  const [recibido, setRecibido] = useState('');
+  const [procesando, setProcesando] = useState(false);
+  const [err, setErr] = useState('');
+
+  const total = cot.calc.total;
+  const estado = cot.estadoPlan;
+  const vencida = (estado === 'enviado' || estado === 'aceptado') && hoy() > cot.vuelo.fechaExpiracion;
+  const nueva = onNew && <button className="btn btn-ghost" onClick={onNew}>Nueva cotización</button>;
+
+  const liberar = () => onUpdate(cot.idCotizacion, {
+    estadoPlan: 'cancelado', vuelo: { ...cot.vuelo, estado: 'liberado' }, hotel: { ...cot.hotel, estado: 'liberado' },
+  });
+  const registrar = (pago) => {
+    const ok = pago.estado === 'aprobado';
+    const est = ok ? 'pagado' : 'apartado';
+    onUpdate(cot.idCotizacion, {
+      estadoPlan: ok ? 'confirmado' : 'aceptado', pago,
+      vuelo: { ...cot.vuelo, estado: est }, hotel: { ...cot.hotel, estado: est },
+    });
+    setPagando(false);
+  };
+  const basePago = (extra) => ({ idPago: cot.idCotizacion, metodo, monto: total, fecha: hoy(), referencia: `PAG-${cot.folio}`, ...extra });
+
+  const pagar = () => {
+    setErr('');
+    if (metodo === 'Tarjeta') {
+      const digitos = tarjeta.numero.replace(/\s/g, '');
+      if (!/^\d{16}$/.test(digitos)) return setErr('El número de tarjeta debe tener 16 dígitos.');
+      if (!tarjeta.titular.trim()) return setErr('Escribe el nombre del titular.');
+      if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(tarjeta.vence)) return setErr('La vigencia debe tener el formato MM/AA.');
+      if (!/^\d{3,4}$/.test(tarjeta.cvv)) return setErr('El CVV debe tener 3 o 4 dígitos.');
+      setProcesando(true);
+      setTimeout(() => {
+        setProcesando(false);
+        if (digitos === '4000000000000002') return setErr('El banco rechazó la tarjeta. Prueba con otra.');
+        registrar(basePago({ estado: 'aprobado', ultimos4: digitos.slice(-4) }));
+      }, 1600);
+    } else if (metodo === 'Efectivo') {
+      const monto = Number(recibido);
+      if (!monto || monto < total) return setErr(`El monto recibido debe cubrir ${fmt(total)}.`);
+      registrar(basePago({ estado: 'aprobado', recibido: monto, cambio: monto - total }));
+    } else {
+      registrar(basePago({ estado: 'pendiente' }));
+    }
+  };
+
+  const ficha = (
+    <div className="ficha">
+      <div><span>Banco</span><b>Banco Demo</b></div>
+      <div><span>Beneficiario</span><b>TravelPro Agencia de Viajes</b></div>
+      <div><span>CLABE (ejemplo)</span><b>012 180 0123 4567 8901</b></div>
+      <div><span>Referencia</span><b>PAG-{cot.folio}</b></div>
+      <div><span>Importe</span><b>{fmt(total)}</b></div>
+    </div>
+  );
+
+  if (estado === 'confirmado') return (
+    <>
+      <div className="alert ok">
+        Pago aprobado ({cot.pago.metodo}). Vuelo y hospedaje confirmados en Amadeus.
+        {cot.pago.ultimos4 && ` Tarjeta terminación ${cot.pago.ultimos4}.`}
+        {cot.pago.cambio > 0 && ` Cambio entregado: ${fmt(cot.pago.cambio)}.`}
+      </div>
+      <div className="actions">{nueva}</div>
+    </>
+  );
+
+  if (estado === 'cancelado') return (
+    <>
+      <div className="alert err">Apartados liberados en Amadeus. La cotización quedó cancelada.</div>
+      <div className="actions">{nueva}</div>
+    </>
+  );
+
+  if (estado === 'aceptado') return (
+    <>
+      <div className={`alert ${vencida ? 'err' : 'warn'}`}>
+        {vencida
+          ? 'Los apartados vencieron sin recibir la transferencia. Libera la cotización para cerrarla.'
+          : `Esperando la transferencia. Los apartados siguen vigentes hasta el ${fechaLarga(cot.vuelo.fechaExpiracion)}.`}
+      </div>
+      {ficha}
+      <div className="actions">
+        <button className="btn btn-ok" disabled={vencida} onClick={() => registrar({ ...cot.pago, estado: 'aprobado', fecha: hoy() })}>Confirmar transferencia recibida</button>
+        <button className="btn btn-danger" onClick={liberar}>Liberar apartados</button>
+        {nueva}
+      </div>
+    </>
+  );
+
+  // estado === 'enviado'
+  return (
+    <>
+      {vencida
+        ? <div className="alert err">Los apartados vencieron el {fechaLarga(cot.vuelo.fechaExpiracion)}. Libera la cotización para cerrarla.</div>
+        : <div className="alert warn">Los apartados vencen el {fechaLarga(cot.vuelo.fechaExpiracion)}. Registra la respuesta del cliente antes de esa fecha.</div>}
+
+      {!pagando && (
+        <>
+          <div className="card-title" style={{ fontSize: 16, marginBottom: 10 }}>Respuesta del cliente</div>
+          <div className="actions">
+            <button className="btn btn-ok" disabled={vencida} onClick={() => setPagando(true)}>El cliente acepta</button>
+            <button className="btn btn-danger" onClick={liberar}>El cliente rechaza · liberar apartados</button>
+            {nueva}
+          </div>
+        </>
+      )}
+
+      {pagando && (
+        <div className="paybox">
+          <div className="card-title" style={{ fontSize: 16, marginBottom: 10 }}>Pago de {fmt(total)}</div>
+          <div className="pay-tabs">
+            {METODOS.map(([m, d]) => (
+              <button key={m} type="button" className={`pay-tab ${metodo === m ? 'on' : ''}`} onClick={() => { setMetodo(m); setErr(''); }}>{m}<small>{d}</small></button>
+            ))}
+          </div>
+          {err && <div className="alert err" role="alert">{err}</div>}
+
+          {metodo === 'Tarjeta' && (
+            <>
+              <div className="field"><label>Número de tarjeta</label>
+                <input className="input" inputMode="numeric" placeholder="4242 4242 4242 4242" value={tarjeta.numero}
+                  onChange={(e) => setTarjeta({ ...tarjeta, numero: e.target.value.replace(/\D/g, '').slice(0, 16).replace(/(\d{4})(?=\d)/g, '$1 ') })} /></div>
+              <div className="field"><label>Titular</label>
+                <input className="input" value={tarjeta.titular} onChange={(e) => setTarjeta({ ...tarjeta, titular: e.target.value })} /></div>
+              <div className="row">
+                <div className="field"><label>Vigencia (MM/AA)</label>
+                  <input className="input" inputMode="numeric" placeholder="08/29" value={tarjeta.vence}
+                    onChange={(e) => { const d = e.target.value.replace(/\D/g, '').slice(0, 4); setTarjeta({ ...tarjeta, vence: d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d }); }} /></div>
+                <div className="field"><label>CVV</label>
+                  <input className="input" inputMode="numeric" type="password" value={tarjeta.cvv}
+                    onChange={(e) => setTarjeta({ ...tarjeta, cvv: e.target.value.replace(/\D/g, '').slice(0, 4) })} /></div>
+              </div>
+              <div className="hint" style={{ marginBottom: 14 }}>Pago simulado: solo se guardan los últimos 4 dígitos. Prueba con 4242 4242 4242 4242 (aprobada) o 4000 0000 0000 0002 (rechazada).</div>
+            </>
+          )}
+
+          {metodo === 'Transferencia' && (
+            <>
+              {ficha}
+              <div className="hint" style={{ marginBottom: 14 }}>Quedará pendiente hasta que confirmes la recepción. Los apartados siguen vigentes mientras tanto.</div>
+            </>
+          )}
+
+          {metodo === 'Efectivo' && (
+            <div className="field"><label>Monto recibido</label>
+              <input className="input" type="number" min="0" step="0.01" value={recibido} onChange={(e) => setRecibido(e.target.value)} />
+              <div className="hint">Total a cobrar: {fmt(total)} · Cambio: {fmt(Math.max(0, (Number(recibido) || 0) - total))}</div></div>
+          )}
+
+          <div className="actions">
+            <button className="btn btn-ok" onClick={pagar} disabled={procesando}>
+              {procesando ? 'Procesando pago…' : metodo === 'Tarjeta' ? `Pagar ${fmt(total)}` : metodo === 'Efectivo' ? 'Registrar cobro en efectivo' : 'Generar ficha de transferencia'}
+            </button>
+            <button className="btn btn-ghost" disabled={procesando} onClick={() => { setPagando(false); setErr(''); }}>Volver</button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 function Rail({ step, subDone }) {
   const cur = subDone.findIndex((d) => !d);
   return (
@@ -513,7 +713,7 @@ function LiveSummary({ c, pax, plan }) {
   );
 }
 
-function QuoteWizardModule({ user, clientes, nextFolio, onSave, onUpdate, onNew, goTo }) {
+function QuoteWizardModule({ user, clientes, cotizaciones, nextFolio, onSave, onUpdate, onNew, goTo }) {
   const misClientes = clientes.filter((c) => c.idAgente === user.id);
   const [step, setStep] = useState(1);
   const [error, setError] = useState('');
@@ -531,11 +731,10 @@ function QuoteWizardModule({ user, clientes, nextFolio, onSave, onUpdate, onNew,
   const [transportes, setTransportes] = useState([]);
   // Paso 3
   const [viajeros, setViajeros] = useState([]);
-  const [itinerario, setItinerario] = useState([]);
-  // Paso 4
-  const [cot, setCot] = useState(null);
-  const [pagando, setPagando] = useState(false);
-  const [metodo, setMetodo] = useState('Tarjeta');
+  const [itinerario, setItinerario] = useState([]); // una fila por atracción elegida
+  // Paso 4: la cotización enviada vive en App para poder gestionarla después desde "Cotizaciones"
+  const [cotId, setCotId] = useState(null);
+  const cot = cotizaciones.find((c) => c.idCotizacion === cotId) || null;
 
   if (misClientes.length === 0) {
     return (
@@ -582,26 +781,22 @@ function QuoteWizardModule({ user, clientes, nextFolio, onSave, onUpdate, onNew,
   const irPaso3 = () => {
     if (atracciones.length === 0) return setError('Selecciona al menos una atracción (paso 2.2).');
     if (transportes.length === 0) return setError('Selecciona al menos un transporte (paso 2.4).');
+    // El itinerario se arma con las atracciones elegidas; se conservan el día y la hora ya capturados
+    setItinerario(atracciones.map((a, i) => {
+      const previo = itinerario.find((x) => x.idAtraccion === a.idAtraccion);
+      return previo
+        ? { ...previo, dia: Math.min(previo.dia, dias) }
+        : { idAtraccion: a.idAtraccion, nombre: a.nombre, dia: 2 + (i % Math.max(dias - 1, 1)), hora: '10:00', notas: '' };
+    }));
     setError(''); setStep(3);
   };
   const irPaso4 = () => {
     if (viajeros.some((v) => !v.nombre.trim())) return setError('Escribe el nombre de cada viajero.');
-    if (itinerario.length === 0) return setError('Agrega al menos una actividad al itinerario (paso 3.1).');
     setError(''); setStep(4);
   };
 
-  // ---- 3.1 Itinerario
-  const autoItinerario = () => {
-    const base = [
-      { dia: 1, hora: '08:00', notas: `Vuelo ${vuelo.aerolinea} a ${plan.destino}` },
-      { dia: 1, hora: '15:00', notas: `Check-in en ${hotel.nombre}` },
-    ];
-    atracciones.forEach((a, i) => base.push({ dia: 2 + (i % Math.max(dias - 1, 1)), hora: '10:00', notas: `Visita: ${a.nombre}` }));
-    base.push({ dia: dias, hora: '10:00', notas: 'Check-out y regreso' });
-    setItinerario(base.map((x, i) => ({ ...x, id: Date.now() + i })));
-  };
-  const agregarActividad = (dia, hora, notas) =>
-    setItinerario([...itinerario, { id: Date.now(), dia, hora: hora || '09:00', notas }]);
+  // ---- 3.1 Itinerario: cada atracción elegida recibe un día y una hora
+  const editarActividad = (id, patch) => setItinerario(itinerario.map((x) => (x.idAtraccion === id ? { ...x, ...patch } : x)));
 
   // ---- 3.2 Viajeros y gastos extras
   const editarViajero = (id, patch) => setViajeros(viajeros.map((v) => (v.idViajero === id ? { ...v, ...patch } : v)));
@@ -618,26 +813,11 @@ function QuoteWizardModule({ user, clientes, nextFolio, onSave, onUpdate, onNew,
       noches: plan.noches, viajeros, vuelo, hotel, transportes, atracciones, itinerario, calc,
       rutaPDF: `/cotizaciones/${folio}.pdf`, estadoPlan: 'enviado', pago: null,
     };
-    setCot(nueva); onSave(nueva);
+    onSave(nueva); setCotId(nueva.idCotizacion);
   };
 
-  // ---- 4.4 Respuesta del cliente
-  const aceptar = () => {
-    const aprobado = metodo === 'Tarjeta';
-    const estadoRes = aprobado ? 'pagado' : 'apartado';
-    const patch = {
-      estadoPlan: aprobado ? 'confirmado' : 'aceptado',
-      vuelo: { ...cot.vuelo, estado: estadoRes }, hotel: { ...cot.hotel, estado: estadoRes },
-      pago: { idPago: cot.idCotizacion, metodo, monto: cot.calc.total, estado: aprobado ? 'aprobado' : 'pendiente', fecha: hoy() },
-    };
-    setCot({ ...cot, ...patch }); onUpdate(cot.idCotizacion, patch); setPagando(false);
-  };
-  const rechazar = () => {
-    const patch = { estadoPlan: 'cancelado', vuelo: { ...cot.vuelo, estado: 'liberado' }, hotel: { ...cot.hotel, estado: 'liberado' } };
-    setCot({ ...cot, ...patch }); onUpdate(cot.idCotizacion, patch);
-  };
-
-  const respondido = cot && (cot.estadoPlan === 'confirmado' || cot.estadoPlan === 'aceptado' || cot.estadoPlan === 'cancelado');
+  // ---- 4.4 Confirmar o liberar: lo maneja <PanelRespuesta />
+  const respondido = !!cot && cot.estadoPlan !== 'enviado';
   const viajerosOk = viajeros.length > 0 && viajeros.every((v) => v.nombre.trim());
   const subDone = [
     [buscado, !!vuelo, !!vuelo, !!hotel],
@@ -786,15 +966,21 @@ function QuoteWizardModule({ user, clientes, nextFolio, onSave, onUpdate, onNew,
         {step === 3 && (
           <>
             <div className="card">
-              <div className="card-head">
-                <div><div className="card-title">3.1 Itinerario por día</div><div className="card-sub">{dias} días · del {fechaLarga(plan.fechaInicio)} al {fechaLarga(fechaFin)}</div></div>
-                <button className="btn btn-ghost btn-sm" onClick={autoItinerario}>Generar borrador</button>
-              </div>
-              {Array.from({ length: dias }, (_, i) => i + 1).map((d) => (
-                <DiaItinerario key={d} dia={d} fecha={sumarDias(plan.fechaInicio, d - 1)}
-                  items={itinerario.filter((x) => x.dia === d).sort((a, b) => a.hora.localeCompare(b.hora))}
-                  atracciones={atracciones} onAdd={agregarActividad}
-                  onRemove={(id) => setItinerario(itinerario.filter((x) => x.id !== id))} />
+              <div className="card-head"><div><div className="card-title">3.1 Itinerario de actividades</div>
+                <div className="card-sub">Una fila por cada atracción elegida. Asigna el día y la hora de cada visita.</div></div></div>
+              {itinerario.map((x) => (
+                <div key={x.idAtraccion} className="it-row">
+                  <div><b>{x.nombre}</b>
+                    <input className="input" style={{ marginTop: 6 }} placeholder="Nota (opcional)" value={x.notas}
+                      onChange={(e) => editarActividad(x.idAtraccion, { notas: e.target.value })} /></div>
+                  <select className="input" aria-label={`Día de ${x.nombre}`} value={x.dia}
+                    onChange={(e) => editarActividad(x.idAtraccion, { dia: Number(e.target.value) })}>
+                    {Array.from({ length: dias }, (_, i) => i + 1).map((d) => (
+                      <option key={d} value={d}>Día {d} · {fechaCorta(sumarDias(plan.fechaInicio, d - 1))}</option>))}
+                  </select>
+                  <input className="input" type="time" aria-label={`Hora de ${x.nombre}`} value={x.hora}
+                    onChange={(e) => editarActividad(x.idAtraccion, { hora: e.target.value || '10:00' })} />
+                </div>
               ))}
             </div>
 
@@ -869,44 +1055,10 @@ function QuoteWizardModule({ user, clientes, nextFolio, onSave, onUpdate, onNew,
               <>
                 <QuoteTicket cot={cot} />
                 <div className="card">
-                  <div className="card-head"><div><div className="card-title">4.3 Cotización enviada</div>
-                    <div className="card-sub">PDF {cot.rutaPDF} enviado a {cot.cliente.email}.</div></div>
+                  <div className="card-head"><div><div className="card-title">4.3 Cotización enviada · 4.4 Confirmar o liberar</div>
+                    <div className="card-sub">PDF {cot.rutaPDF} enviado a {cot.cliente.email}. Si sales de esta pantalla, puedes continuar desde Cotizaciones.</div></div>
                     <button className="btn btn-ghost btn-sm" onClick={() => window.print()}>Imprimir / guardar PDF</button></div>
-
-                  {!respondido && !pagando && (
-                    <>
-                      <div className="alert warn">Los apartados vencen el {fechaLarga(cot.vuelo.fechaExpiracion)}. Registra la respuesta del cliente antes de esa fecha.</div>
-                      <div className="card-title" style={{ fontSize: 16, marginBottom: 10 }}>4.4 Respuesta del cliente</div>
-                      <div className="actions">
-                        <button className="btn btn-ok" onClick={() => setPagando(true)}>El cliente acepta</button>
-                        <button className="btn btn-danger" onClick={rechazar}>El cliente rechaza (liberar apartados)</button>
-                      </div>
-                    </>
-                  )}
-
-                  {pagando && (
-                    <div style={{ maxWidth: 360 }}>
-                      <div className="field"><label>Método de pago</label>
-                        <select className="input" value={metodo} onChange={(e) => setMetodo(e.target.value)}>
-                          <option>Tarjeta</option><option>Transferencia</option></select>
-                        <div className="hint">Con tarjeta el pago se aprueba y se confirman los apartados. Con transferencia queda pendiente.</div></div>
-                      <div className="actions">
-                        <button className="btn btn-ok" onClick={aceptar}>Registrar pago de {fmt(cot.calc.total)}</button>
-                        <button className="btn btn-ghost" onClick={() => setPagando(false)}>Cancelar</button>
-                      </div>
-                    </div>
-                  )}
-
-                  {respondido && (
-                    <>
-                      <div className={`alert ${cot.estadoPlan === 'cancelado' ? 'err' : 'info'}`}>
-                        {cot.estadoPlan === 'cancelado' && 'Apartados liberados en Amadeus. La cotización quedó cancelada.'}
-                        {cot.estadoPlan === 'confirmado' && 'Pago aprobado. Vuelo y hospedaje confirmados en Amadeus.'}
-                        {cot.estadoPlan === 'aceptado' && 'Cotización aceptada. Los apartados siguen vigentes hasta recibir la transferencia.'}
-                      </div>
-                      <button className="btn btn-primary" onClick={onNew}>Nueva cotización</button>
-                    </>
-                  )}
+                  <PanelRespuesta cot={cot} onUpdate={onUpdate} onNew={onNew} />
                 </div>
               </>
             )}
@@ -919,41 +1071,29 @@ function QuoteWizardModule({ user, clientes, nextFolio, onSave, onUpdate, onNew,
   );
 }
 
-function DiaItinerario({ dia, fecha, items, atracciones, onAdd, onRemove }) {
-  const [hora, setHora] = useState('09:00');
-  const [notas, setNotas] = useState('');
-  const agregar = () => { if (notas.trim()) { onAdd(dia, hora, notas.trim()); setNotas(''); } };
-  return (
-    <div className="day">
-      <div className="day-head"><span>Día {dia}</span><span style={{ color: 'var(--ink-3)', fontWeight: 500 }}>{fechaLarga(fecha)}</span></div>
-      {items.length === 0 && <div className="hint">Sin actividades.</div>}
-      {items.map((x) => (
-        <div key={x.id} className="act"><time>{x.hora}</time><span>{x.notas}</span>
-          <button className="x" aria-label="Quitar actividad" onClick={() => onRemove(x.id)}>×</button></div>
-      ))}
-      <div className="act-form">
-        <input className="input" type="time" value={hora} onChange={(e) => setHora(e.target.value)} aria-label="Hora" />
-        <input className="input" placeholder="Actividad o nota" value={notas} onChange={(e) => setNotas(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && agregar()} />
-        <button className="btn btn-ghost btn-sm" onClick={agregar}>Agregar</button>
-      </div>
-      {atracciones.length > 0 && (
-        <div className="chips">{atracciones.map((a) => (
-          <button key={a.idAtraccion} className="chip" onClick={() => setNotas(`Visita: ${a.nombre}`)}>{a.nombre}</button>))}</div>
-      )}
-    </div>
-  );
-}
-
 /* ============================================================
    7. COTIZACIONES GUARDADAS Y DASHBOARD
    ============================================================ */
-function CotizacionesModule({ cotizaciones }) {
+function CotizacionesModule({ cotizaciones, userId, onUpdate }) {
   const [abierta, setAbierta] = useState(null);
   const sel = cotizaciones.find((c) => c.idCotizacion === abierta);
+  const pendiente = (c) => c.estadoPlan === 'enviado' || c.estadoPlan === 'aceptado';
+  const vencida = (c) => pendiente(c) && hoy() > c.vuelo.fechaExpiracion;
   return (
     <>
-      {sel && <><QuoteTicket cot={sel} /><button className="btn btn-ghost btn-sm" style={{ marginBottom: 20 }} onClick={() => setAbierta(null)}>Cerrar detalle</button></>}
+      {sel && (
+        <>
+          <QuoteTicket cot={sel} />
+          <div className="card">
+            <div className="card-head"><div><div className="card-title">{sel.folio} · confirmar o liberar</div>
+              <div className="card-sub">Cliente: {sel.cliente.nombre} · Order IDs: {sel.vuelo.orderId}, {sel.hotel.orderId}</div></div>
+              <button className="btn btn-ghost btn-sm" onClick={() => setAbierta(null)}>Cerrar</button></div>
+            {sel.idAgente === userId
+              ? <PanelRespuesta key={`${sel.idCotizacion}-${sel.estadoPlan}`} cot={sel} onUpdate={onUpdate} />
+              : <div className="alert info">Solo el agente que generó la cotización puede registrar la respuesta del cliente.</div>}
+          </div>
+        </>
+      )}
       <div className="card">
         <div className="card-head"><div className="card-title">Cotizaciones generadas</div></div>
         {cotizaciones.length === 0 && <div className="empty">Aún no hay cotizaciones enviadas.</div>}
@@ -963,8 +1103,11 @@ function CotizacionesModule({ cotizaciones }) {
             <tbody>
               {cotizaciones.map((c) => (
                 <tr key={c.idCotizacion}><td>{c.folio}</td><td>{c.cliente.nombre}</td><td>{c.destino}, {c.pais}</td>
-                  <td><EstadoPill estado={c.estadoPlan} /></td><td className="r num">{fmt(c.calc.total)}</td>
-                  <td className="r"><button className="btn btn-ghost btn-sm" onClick={() => setAbierta(c.idCotizacion)}>Ver</button></td></tr>
+                  <td><EstadoPill estado={c.estadoPlan} />{vencida(c) && <> <span className="pill red">Apartados vencidos</span></>}</td>
+                  <td className="r num">{fmt(c.calc.total)}</td>
+                  <td className="r"><button className={`btn btn-sm ${pendiente(c) && c.idAgente === userId ? 'btn-primary' : 'btn-ghost'}`}
+                    onClick={() => { setAbierta(c.idCotizacion); window.scrollTo?.(0, 0); }}>
+                    {pendiente(c) && c.idAgente === userId ? 'Gestionar' : 'Ver'}</button></td></tr>
               ))}
             </tbody>
           </table>
@@ -987,6 +1130,19 @@ function Dashboard({ user, cotizaciones, goTo }) {
         <div className="stat"><b className="num">{fmt(ventas)}</b><span>Ventas confirmadas</span></div>
         <div className="stat"><b className="num">{fmt(comisiones)}</b><span>Comisión ganada</span></div>
       </div>
+      {pend.length > 0 && (
+        <div className="card">
+          <div className="card-head"><div><div className="card-title">Pendientes de respuesta</div>
+            <div className="card-sub">Confirma o libera los apartados antes de que venzan.</div></div>
+            <button className="btn btn-primary btn-sm" onClick={() => goTo('cotizaciones')}>Gestionar</button></div>
+          {pend.map((c) => (
+            <div key={c.idCotizacion} className="list-item">
+              <span><b>{c.folio}</b> · {c.cliente.nombre} · {c.destino}</span>
+              <span className="hint">vence {fechaLarga(c.vuelo.fechaExpiracion)}</span>
+            </div>
+          ))}
+        </div>
+      )}
       {user.rol === 'agente' && (
         <div className="card">
           <div className="card-title">¿Un nuevo viaje?</div>
@@ -1046,10 +1202,10 @@ function App() {
             {tab === 'personal' && <AdminUsersModule user={user} usuarios={usuarios} setUsuarios={setUsuarios} />}
             {tab === 'clientes' && <AgentClientModule user={user} clientes={clientes} setClientes={setClientes} />}
             {tab === 'cotizar' && (
-              <QuoteWizardModule key={wizardKey} user={user} clientes={clientes} nextFolio={cotizaciones.length + 1}
+              <QuoteWizardModule key={wizardKey} user={user} clientes={clientes} nextFolio={cotizaciones.length + 1} cotizaciones={cotizaciones}
                 onSave={guardar} onUpdate={actualizar} onNew={nueva} goTo={setTab} />
             )}
-            {tab === 'cotizaciones' && <CotizacionesModule cotizaciones={visibles} />}
+            {tab === 'cotizaciones' && <CotizacionesModule cotizaciones={visibles} userId={user.id} onUpdate={actualizar} />}
           </div>
         </main>
       </div>
